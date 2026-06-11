@@ -1,0 +1,26 @@
+# Activate Keycloak profile
+spring:
+  profiles:
+    active: keycloak
+
+
+# Security configuration
+insurance:
+  security:
+    idp:
+      type: keycloak
+
+# Keycloak configuration
+keycloak:
+  server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}
+  realm: ${KEYCLOAK_REALM:lz-insurance}
+  client-id: ${KEYCLOAK_CLIENT_ID:lz-insurance-credential-id}
+  grant-type: ${KEYCLOAK_GRANT_TYPE:password}
+  username: ${KEYCLOAK_USERNAME:zote}
+  password: ${KEYCLOAK_PASSWORD:zote}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:mAONFHck6LiZewGnPR6ixTqZKBVEJjw2}
+  auth-server-url: ${keycloak.server-url}/realms/${keycloak.realm}/protocol/openid-connect/token
+  connection-timeout: ${KEYCLOAK_CONNECTION_TIMEOUT:10}
+  socket-timeout: ${KEYCLOAK_SOCKET_TIMEOUT:10}
+  scope: ${KEYCLOAK_SCOPE:openid email profile}
+
