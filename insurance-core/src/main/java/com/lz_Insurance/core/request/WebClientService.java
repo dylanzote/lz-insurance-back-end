@@ -78,22 +78,53 @@ public class WebClientService implements HttpService{
 
     @Override
     public <T> T get(String url, Class<T> responseType, Map<String, String> headers, Map<String, String> queryParams) {
-        return null;
+        log.info("Consuming GET API with headers and query params");
+        return WebClient.create()
+                .get()
+                .uri(uriBuilder -> {
+                    uriBuilder.path(url);
+                    if (queryParams != null) {
+                        queryParams.forEach(uriBuilder::queryParam);
+                    }
+                    return uriBuilder.build();
+                })
+                .headers(httpHeaders -> {
+                    if (headers != null) {
+                        headers.forEach(httpHeaders::add);
+                    }
+                })
+                .retrieve()
+                .onStatus(httpStatusCode -> !httpStatusCode.is2xxSuccessful(), clientResponse -> {
+                    log.info(ERROR_MESSAGE);
+                    var error = clientResponse.bodyToMono(ErrorResponse.class);
+                    return error.map(errorMessage -> {
+                        log.error("api error message is {}", errorMessage);
+                        return new FunctionalException(errorMessage.getBody().getDetail());
+                    });
+                })
+                .bodyToMono(responseType)
+                .block();
     }
 
     @Override
     public <T, R> T post(String url, R request, Class<T> responseType, Map<String, String> headers) {
+        log.info("Consuming POST API with headers");
         return WebClient.create()
                 .post()
                 .uri(url)
-                .headers(httpHeaders -> headers.forEach(httpHeaders::add))
+                .headers(httpHeaders -> {
+                    if (headers != null) {
+                        headers.forEach(httpHeaders::add);
+                    }
+                })
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .retrieve()
                 .onStatus(httpStatusCode -> !httpStatusCode.is2xxSuccessful(), clientResponse -> {
                     log.info(ERROR_MESSAGE);
                     var error = clientResponse.bodyToMono(ErrorResponse.class);
                     return error.map(errorMessage -> {
-                        log.info("logged error is {}", errorMessage);
+                        log.error("api error message is {}", errorMessage);
                         return new FunctionalException(errorMessage.getBody().getDetail());
                     });
                 })

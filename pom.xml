@@ -24,6 +24,7 @@
         <module>insurance-product-engine</module>
         <module>insurance-dto</module>
         <module>insurance-testcontainers</module>
+        <module>insurance-identity-service</module>
     </modules>
 
     <properties>
@@ -36,8 +37,9 @@
         <lombok.version>1.18.42</lombok.version>
 
         <!-- Spring Boot & Cloud -->
-        <spring-boot.version>3.2.6</spring-boot.version>
+        <spring-boot.version>4.1.0</spring-boot.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <spring-boot-aop.version>4.0.0-M2</spring-boot-aop.version>
 
         <!-- Database -->
         <postgresql.version>42.7.10</postgresql.version>
@@ -63,6 +65,7 @@
         <!-- Testing -->
         <testcontainers.version>2.0.4</testcontainers.version>
         <archunit.version>1.2.0</archunit.version>
+        <junit-jupiter.version>1.21.4</junit-jupiter.version>
 
         <!-- Plugins -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -100,7 +103,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-aop</artifactId>
-                <version>${spring-boot.version}</version>
+                <version>${spring-boot-aop.version}</version>
             </dependency>
 
             <!-- Internal Modules -->
@@ -120,15 +123,10 @@
             </dependency>
 
             <!-- Liquibase -->
-            <dependency>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-core</artifactId>
-                <version>${liquibase.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-liquibase</artifactId>
+                <artifactId>spring-boot-starter-liquibase</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
 
@@ -186,6 +184,11 @@
                 <artifactId>redis</artifactId>
                 <version>${testcontainers.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
             </dependency>
 
             <!-- ArchUnit -->
