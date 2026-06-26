@@ -32,4 +32,10 @@ public class RolePermissionConfig extends BaseDomainEntity {
         this.permissionId = permissionId;
         this.grantedScope = grantedScope;
     }
+
+    /** Rebuilds a {@code RolePermissionConfig} from its persisted state (infrastructure mapper only). */
+    public static RolePermissionConfig reconstitute(String tenantId, String roleId, String permissionId,
+                                                    OrganizationScope grantedScope) {
+        return new RolePermissionConfig(tenantId, roleId, permissionId, grantedScope);
+    }
 }

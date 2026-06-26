@@ -31,6 +31,12 @@ public class Permission extends BaseDomainEntity {
         this.defaultScope = defaultScope;
     }
 
+    /** Rebuilds a {@code Permission} from its persisted state (infrastructure mapper only). */
+    public static Permission reconstitute(PermissionResource resource, PermissionAction action,
+                                          OrganizationScope defaultScope) {
+        return new Permission(resource, action, defaultScope);
+    }
+
     /** Canonical {@code resource:action:scope} key. */
     public String key() {
         return "%s:%s:%s".formatted(resource, action, defaultScope);

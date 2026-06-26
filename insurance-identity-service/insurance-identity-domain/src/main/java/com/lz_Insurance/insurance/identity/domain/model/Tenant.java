@@ -39,6 +39,39 @@ public class Tenant extends BaseDomainEntity {
     }
 
     /**
+     * Reconstitution constructor for the persistence layer: assigns every field
+     * from already-stored, already-valid state. Performs only structural validation
+     * (null/format) and does NOT re-apply creation-time defaults.
+     */
+    private Tenant(String name, String code, String country,
+                   boolean bootstrapped, String headquarterBranchId, TenantStatus status) {
+        DomainGuard.notBlank(name, "name");
+        DomainGuard.notBlank(code, "code");
+        DomainGuard.notBlank(country, "country");
+        DomainGuard.isTrue(country.length() == 2, "country",
+                "country must be an ISO 3166-1 alpha-2 code");
+        DomainGuard.notNull(status, "status");
+
+        this.name = name;
+        this.code = code;
+        this.country = country.toUpperCase();
+        this.bootstrapped = bootstrapped;
+        this.headquarterBranchId = headquarterBranchId;
+        this.status = status;
+    }
+
+    /**
+     * Rebuilds a {@code Tenant} from its persisted state. Used only by the
+     * infrastructure mapper; base/audit fields are restored separately via the
+     * inherited setters.
+     */
+    public static Tenant reconstitute(String name, String code, String country,
+                                      boolean bootstrapped, String headquarterBranchId,
+                                      TenantStatus status) {
+        return new Tenant(name, code, country, bootstrapped, headquarterBranchId, status);
+    }
+
+    /**
      * One-time bootstrap ceremony marker: records the headquarter branch and
      * flips {@code bootstrapped}. Idempotency (rejecting a second bootstrap) is
      * enforced by the use case, but the model refuses to lose its HQ reference.

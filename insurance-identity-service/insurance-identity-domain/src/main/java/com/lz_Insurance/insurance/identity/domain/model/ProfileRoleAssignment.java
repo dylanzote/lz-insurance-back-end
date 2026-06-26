@@ -30,6 +30,11 @@ public class ProfileRoleAssignment extends BaseDomainEntity {
         this.branchId = branchId;
     }
 
+    /** Rebuilds a {@code ProfileRoleAssignment} from its persisted state (infrastructure mapper only). */
+    public static ProfileRoleAssignment reconstitute(String identityProfileId, String roleId, String tenantId, String branchId) {
+        return new ProfileRoleAssignment(identityProfileId, roleId, tenantId, branchId);
+    }
+
     public boolean isTenantWide() {
         return branchId == null;
     }

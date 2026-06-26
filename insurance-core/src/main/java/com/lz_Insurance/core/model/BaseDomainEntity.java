@@ -12,6 +12,15 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * Framework-free base for domain models (id, version, audit fields, soft delete).
+ *
+ * <p><b>Intentional mirror of {@code com.lz_Insurance.persistence.entity.BaseJpaEntity}.</b>
+ * That class is the JPA-mapped counterpart used by persistence entities; the two
+ * deliberately carry the same field set across the domain/infrastructure boundary and
+ * are bridged by the MapStruct mappers — do NOT merge them to "remove the duplication":
+ * the separation keeps JPA out of the domain.
+ */
 @Data
 @SuperBuilder
 @NoArgsConstructor

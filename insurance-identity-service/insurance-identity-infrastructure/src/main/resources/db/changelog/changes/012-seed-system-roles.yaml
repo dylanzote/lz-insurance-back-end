@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 012-seed-system-roles
+      author: identity
+      comment: >-
+        The nine default SYSTEM roles (six internal, three external). These are
+        global platform defaults — SystemRole has no tenantId, so tenant-scoped
+        CUSTOM roles are not yet possible (see docs/known-gaps.md).
+      changes:
+        - loadData:
+            tableName: system_roles
+            file: db/changelog/data/system_roles.csv
+            relativeToChangelogFile: false
+            usePreparedStatements: true
+            columns:
+              - column: {name: id, type: STRING}
+              - column: {name: name, type: STRING}
+              - column: {name: role_type, type: STRING}
+              - column: {name: description, type: STRING}

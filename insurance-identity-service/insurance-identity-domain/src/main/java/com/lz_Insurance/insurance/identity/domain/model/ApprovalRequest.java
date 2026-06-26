@@ -39,6 +39,38 @@ public class ApprovalRequest extends BaseDomainEntity {
         this.status = ApprovalStatus.PENDING;
     }
 
+    /**
+     * Reconstitution constructor for the persistence layer: restores the full decided
+     * (or pending) state, including the stored {@code requestedAt}/{@code reviewedAt},
+     * rather than re-stamping {@code requestedAt} to now.
+     */
+    private ApprovalRequest(String identityProfileId, String requestedById, String requestNotes,
+                            LocalDateTime requestedAt, ApprovalStatus status,
+                            String reviewedById, String reviewNotes, LocalDateTime reviewedAt) {
+        DomainGuard.notBlank(identityProfileId, "identityProfileId");
+        DomainGuard.notBlank(requestedById, "requestedById");
+        DomainGuard.notNull(requestedAt, "requestedAt");
+        DomainGuard.notNull(status, "status");
+
+        this.identityProfileId = identityProfileId;
+        this.requestedById = requestedById;
+        this.requestNotes = requestNotes;
+        this.requestedAt = requestedAt;
+        this.status = status;
+        this.reviewedById = reviewedById;
+        this.reviewNotes = reviewNotes;
+        this.reviewedAt = reviewedAt;
+    }
+
+    /** Rebuilds an {@code ApprovalRequest} from its persisted state (infrastructure mapper only). */
+    public static ApprovalRequest reconstitute(String identityProfileId, String requestedById,
+                                               String requestNotes, LocalDateTime requestedAt,
+                                               ApprovalStatus status, String reviewedById,
+                                               String reviewNotes, LocalDateTime reviewedAt) {
+        return new ApprovalRequest(identityProfileId, requestedById, requestNotes, requestedAt,
+                status, reviewedById, reviewNotes, reviewedAt);
+    }
+
     public void approve(String reviewerId, String notes) {
         decide(ApprovalStatus.APPROVED, reviewerId, notes);
     }

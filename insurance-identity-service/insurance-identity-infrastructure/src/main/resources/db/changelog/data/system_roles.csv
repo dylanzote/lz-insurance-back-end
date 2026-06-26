@@ -1,0 +1,10 @@
+id,name,role_type,description
+role-tenant-admin,TENANT_ADMIN,SYSTEM,Full tenant administration across all branches
+role-branch-manager,BRANCH_MANAGER,SYSTEM,Manages a single branch: staff onboarding and claim approval
+role-underwriter,UNDERWRITER,SYSTEM,Assesses and approves policies within a branch
+role-agent,AGENT,SYSTEM,Front-line sales; creates policies and claims for own book
+role-claims-adjuster,CLAIMS_ADJUSTER,SYSTEM,Investigates and updates claims; cannot approve them
+role-staff,STAFF,SYSTEM,Baseline branch-scoped read access
+role-policyholder,POLICYHOLDER,SYSTEM,External self-service over own policies and claims
+role-claimant,CLAIMANT,SYSTEM,External user filing and tracking their own claim
+role-beneficiary,BENEFICIARY,SYSTEM,External read-only visibility into the policy/claim naming them

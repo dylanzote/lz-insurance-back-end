@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-seed-role-permissions
+      author: identity
+      comment: >-
+        System-default role -> permission grants, seeded strictly from the approved
+        RBAC matrix. Principles: least privilege (OWN/BRANCH preferred, ALL only for
+        TENANT_ADMIN), separation of duties (AGENT/CLAIMS_ADJUSTER never approve;
+        reject mirrors approve), external roles OWN-only with zero internal-resource
+        access.
+        PROVISIONAL: the policy/claim/report grants target services not yet built
+        (policy-service, claims-service, reporting) and will be revisited at those
+        services' design. The identity-owned grants (user/branch/tenant/permission/
+        session/audit) are final for M1.
+      changes:
+        - loadData:
+            tableName: role_permissions
+            file: db/changelog/data/role_permissions.csv
+            relativeToChangelogFile: false
+            usePreparedStatements: true
+            columns:
+              - column: {name: id, type: STRING}
+              - column: {name: role_id, type: STRING}
+              - column: {name: permission_id, type: STRING}
+              - column: {name: granted_scope, type: STRING}

@@ -1,0 +1,79 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-role-permission-configs
+      author: identity
+      comment: Tenant-scoped override of a role's granted scope for a permission.
+      changes:
+        - createTable:
+            tableName: role_permission_configs
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+                  defaultValue: SYSTEM
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: VARCHAR(255)
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted_by
+                  type: VARCHAR(255)
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_role_permission_configs_tenant
+                    references: tenants(id)
+              - column:
+                  name: role_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_role_permission_configs_role
+                    references: system_roles(id)
+              - column:
+                  name: permission_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_role_permission_configs_permission
+                    references: permissions(id)
+              - column:
+                  name: granted_scope
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: role_permission_configs
+            columnNames: tenant_id, role_id, permission_id
+            constraintName: uq_role_permission_configs_tenant_role_permission

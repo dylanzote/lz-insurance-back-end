@@ -42,6 +42,37 @@ public class Branch extends BaseDomainEntity {
         this.status = BranchStatus.ACTIVE;
     }
 
+    /**
+     * Reconstitution constructor for the persistence layer: structural validation
+     * only, restores the stored status rather than forcing ACTIVE.
+     */
+    private Branch(String tenantId, String parentBranchId, String name, String code,
+                   BranchType type, BranchStatus status) {
+        DomainGuard.notBlank(tenantId, "tenantId");
+        DomainGuard.notBlank(name, "name");
+        DomainGuard.notBlank(code, "code");
+        DomainGuard.notNull(type, "type");
+        DomainGuard.notNull(status, "status");
+
+        if (type == BranchType.HEADQUARTER) {
+            DomainGuard.isNull(parentBranchId, "parentBranchId",
+                    "a HEADQUARTER branch cannot have a parentBranchId");
+        }
+
+        this.tenantId = tenantId;
+        this.parentBranchId = parentBranchId;
+        this.name = name;
+        this.code = code;
+        this.type = type;
+        this.status = status;
+    }
+
+    /** Rebuilds a {@code Branch} from its persisted state (infrastructure mapper only). */
+    public static Branch reconstitute(String tenantId, String parentBranchId, String name,
+                                      String code, BranchType type, BranchStatus status) {
+        return new Branch(tenantId, parentBranchId, name, code, type, status);
+    }
+
     public boolean isTopLevel() {
         return parentBranchId == null;
     }

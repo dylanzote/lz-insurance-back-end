@@ -74,6 +74,46 @@ public class IdentityProfile extends BaseDomainEntity {
         this.status = IdentityStatus.PENDING_APPROVAL;
     }
 
+    /**
+     * Reconstitution constructor for the persistence layer: restores the full stored
+     * state (including {@code keycloakUserId} and any non-PENDING status). Enforces the
+     * structural INTERNAL/EXTERNAL field invariants but does NOT force the
+     * PENDING_APPROVAL creation state.
+     */
+    private IdentityProfile(String tenantId, String branchId, ActorType actorType,
+                            InternalUserType internalUserType, ExternalUserType externalUserType,
+                            String email, String firstName, String lastName,
+                            String keycloakUserId, IdentityStatus status) {
+        DomainGuard.notBlank(tenantId, "tenantId");
+        DomainGuard.notNull(actorType, "actorType");
+        DomainGuard.notBlank(email, "email");
+        DomainGuard.notBlank(firstName, "firstName");
+        DomainGuard.notBlank(lastName, "lastName");
+        DomainGuard.notNull(status, "status");
+
+        if (actorType == ActorType.INTERNAL) {
+            DomainGuard.notNull(internalUserType, "internalUserType");
+            DomainGuard.isNull(externalUserType, "externalUserType",
+                    "externalUserType must be null for an INTERNAL profile");
+            DomainGuard.notBlank(branchId, "branchId");
+        } else {
+            DomainGuard.notNull(externalUserType, "externalUserType");
+            DomainGuard.isNull(internalUserType, "internalUserType",
+                    "internalUserType must be null for an EXTERNAL profile");
+        }
+
+        this.tenantId = tenantId;
+        this.branchId = branchId;
+        this.actorType = actorType;
+        this.internalUserType = internalUserType;
+        this.externalUserType = externalUserType;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.keycloakUserId = keycloakUserId;
+        this.status = status;
+    }
+
     /** Factory for an internal staff member, scoped to a branch. */
     public static IdentityProfile internal(String tenantId, String branchId, InternalUserType type,
                                            String email, String firstName, String lastName) {
@@ -86,6 +126,19 @@ public class IdentityProfile extends BaseDomainEntity {
                                            String email, String firstName, String lastName) {
         return new IdentityProfile(tenantId, branchId, ActorType.EXTERNAL, null, type,
                 email, firstName, lastName);
+    }
+
+    /**
+     * Rebuilds an {@code IdentityProfile} from its persisted state (infrastructure mapper only).
+     * Base/audit fields are restored separately via the inherited setters.
+     */
+    public static IdentityProfile reconstitute(String tenantId, String branchId, ActorType actorType,
+                                               InternalUserType internalUserType,
+                                               ExternalUserType externalUserType, String email,
+                                               String firstName, String lastName,
+                                               String keycloakUserId, IdentityStatus status) {
+        return new IdentityProfile(tenantId, branchId, actorType, internalUserType, externalUserType,
+                email, firstName, lastName, keycloakUserId, status);
     }
 
     /**

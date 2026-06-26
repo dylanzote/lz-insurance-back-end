@@ -1,0 +1,29 @@
+databaseChangeLog:
+  # --- Tables (one changeset per aggregate, ordered by FK dependency) ---
+  - include:
+      file: db/changelog/changes/001-create-tenants.yaml
+  - include:
+      file: db/changelog/changes/002-create-branches.yaml
+  - include:
+      file: db/changelog/changes/003-create-identity-profiles.yaml
+  - include:
+      file: db/changelog/changes/004-create-system-roles.yaml
+  - include:
+      file: db/changelog/changes/005-create-permissions.yaml
+  - include:
+      file: db/changelog/changes/006-create-role-permissions.yaml
+  - include:
+      file: db/changelog/changes/007-create-role-permission-configs.yaml
+  - include:
+      file: db/changelog/changes/008-create-profile-role-assignments.yaml
+  - include:
+      file: db/changelog/changes/009-create-approval-requests.yaml
+  - include:
+      file: db/changelog/changes/010-create-session-registry.yaml
+  # --- Seed data (RBAC defaults) ---
+  - include:
+      file: db/changelog/changes/011-seed-permissions.yaml
+  - include:
+      file: db/changelog/changes/012-seed-system-roles.yaml
+  - include:
+      file: db/changelog/changes/013-seed-role-permissions.yaml

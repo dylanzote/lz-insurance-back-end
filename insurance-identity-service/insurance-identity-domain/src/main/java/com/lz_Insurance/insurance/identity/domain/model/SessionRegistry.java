@@ -45,6 +45,38 @@ public class SessionRegistry extends BaseDomainEntity {
         this.lastActivityAt = LocalDateTime.now();
     }
 
+    /**
+     * Reconstitution constructor for the persistence layer: restores the stored status
+     * and {@code lastActivityAt} rather than forcing a fresh ACTIVE session.
+     */
+    private SessionRegistry(String identityProfileId, String tenantId, String sessionToken,
+                            String ipAddress, String userAgent, LocalDateTime expiresAt,
+                            SessionStatus status, LocalDateTime lastActivityAt) {
+        DomainGuard.notBlank(identityProfileId, "identityProfileId");
+        DomainGuard.notBlank(tenantId, "tenantId");
+        DomainGuard.notBlank(sessionToken, "sessionToken");
+        DomainGuard.notNull(expiresAt, "expiresAt");
+        DomainGuard.notNull(status, "status");
+
+        this.identityProfileId = identityProfileId;
+        this.tenantId = tenantId;
+        this.sessionToken = sessionToken;
+        this.ipAddress = ipAddress;
+        this.userAgent = userAgent;
+        this.expiresAt = expiresAt;
+        this.status = status;
+        this.lastActivityAt = lastActivityAt;
+    }
+
+    /** Rebuilds a {@code SessionRegistry} from its persisted state (infrastructure mapper only). */
+    public static SessionRegistry reconstitute(String identityProfileId, String tenantId,
+                                               String sessionToken, String ipAddress, String userAgent,
+                                               LocalDateTime expiresAt, SessionStatus status,
+                                               LocalDateTime lastActivityAt) {
+        return new SessionRegistry(identityProfileId, tenantId, sessionToken, ipAddress, userAgent,
+                expiresAt, status, lastActivityAt);
+    }
+
     /** ACTIVE -> REVOKED (manual / admin sign-out). */
     public void revoke() {
         requireActive(SessionStatus.REVOKED);

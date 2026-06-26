@@ -1,0 +1,103 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-identity-profiles
+      author: identity
+      comment: Unified identity for internal staff and external customers.
+      changes:
+        - createTable:
+            tableName: identity_profiles
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+                  defaultValue: SYSTEM
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: VARCHAR(255)
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted_by
+                  type: VARCHAR(255)
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_identity_profiles_tenant
+                    references: tenants(id)
+              - column:
+                  name: branch_id
+                  type: VARCHAR(36)
+                  constraints:
+                    foreignKeyName: fk_identity_profiles_branch
+                    references: branches(id)
+              - column:
+                  name: actor_type
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: internal_user_type
+                  type: VARCHAR(32)
+              - column:
+                  name: external_user_type
+                  type: VARCHAR(32)
+              - column:
+                  name: keycloak_user_id
+                  type: VARCHAR(255)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_identity_profiles_keycloak_user_id
+              - column:
+                  name: email
+                  type: VARCHAR(320)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: identity_profiles
+            columnNames: tenant_id, email
+            constraintName: uq_identity_profiles_tenant_email

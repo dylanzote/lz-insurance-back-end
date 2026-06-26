@@ -28,6 +28,11 @@ public class SystemRole extends BaseDomainEntity {
         this.description = description;
     }
 
+    /** Rebuilds a {@code SystemRole} from its persisted state (infrastructure mapper only). */
+    public static SystemRole reconstitute(String name, RoleType roleType, String description) {
+        return new SystemRole(name, roleType, description);
+    }
+
     public boolean isSystemDefault() {
         return roleType == RoleType.SYSTEM;
     }
