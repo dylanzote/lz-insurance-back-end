@@ -129,10 +129,15 @@ junction is seeded ONLY from the matrix the product owner has explicitly approve
 ---
 
 ## Known traps in shared modules (do not silently inherit)
-- `AuditLogListener` (insurance-persistence) duplicates `BaseDomainEntity`'s lifecycle and its
-  `preUpdate` does `getVersion()+1` -> **NPE on null version**. DO NOT attach this listener; rely
-  on `BaseDomainEntity`'s own `@PrePersist/@PreUpdate`. A `// FIXME` flags the NPE for later cleanup.
-- See `docs/known-gaps.md` for the full deferred list (package casing, SystemRole tenantId, etc.).
+- **Audit mechanism (settled 2026-06-29):** `BaseJpaEntity` generates `id` via `IdGenerator` in a
+  `@PrePersist` (id only) and populates `createdBy`/`updatedBy`/timestamps through Spring Data JPA
+  auditing (`@EntityListeners(AuditingEntityListener.class)` + `JpaAuditingConfig`'s `auditorProvider`,
+  "SYSTEM" fallback). `@Version` handles optimistic locking. `BaseDomainEntity` is now framework-free
+  (no JPA lifecycle). The old buggy `AuditLogListener` was DELETED (G-004). JPA auditing must be
+  active wherever entities persist — `@DataJpaTest` slices `@Import(JpaAuditingConfig.class)` (G-007),
+  and the app itself does not yet load it (G-009).
+- See `docs/known-gaps.md` for the full deferred list (package casing G-003, SystemRole tenantId G-001,
+  app bean-wiring G-009, opt-in tenant isolation G-010, etc.).
 
 ---
 
