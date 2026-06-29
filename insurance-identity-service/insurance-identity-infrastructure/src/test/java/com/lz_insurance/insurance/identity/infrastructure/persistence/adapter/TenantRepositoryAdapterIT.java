@@ -6,18 +6,15 @@ import com.lz_insurance.insurance.identity.infrastructure.persistence.IdentityPe
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.TenantEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.repository.TenantJpaRepository;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.specification.EntitySpecification;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 /**
  * Integration test for {@link TenantRepositoryAdapter} against a real Postgres. Proves the
@@ -34,14 +31,6 @@ class TenantRepositoryAdapterIT extends IdentityPersistenceIT {
 
     @Autowired
     private TenantJpaRepository jpaRepository;
-
-    @Autowired
-    private TestEntityManager entityManager;
-
-    @BeforeEach
-    void stubAuditor() {
-        given(currentUserService.getCurrentUserId()).willReturn("test-user");
-    }
 
     @Test
     @DisplayName("save then reload preserves id and populates audit fields")
@@ -109,10 +98,5 @@ class TenantRepositoryAdapterIT extends IdentityPersistenceIT {
         Specification<TenantEntity> others =
                 new EntitySpecification<TenantEntity>().notDeleted().withCreatedBy("someone-else");
         assertThat(jpaRepository.findAll(others)).isEmpty();
-    }
-
-    private void flushAndClear() {
-        entityManager.flush();
-        entityManager.clear();
     }
 }
