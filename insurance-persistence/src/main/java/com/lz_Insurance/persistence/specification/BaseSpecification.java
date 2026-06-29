@@ -1,6 +1,6 @@
 package com.lz_Insurance.persistence.specification;
 
-import com.lz_Insurance.core.model.BaseDomainEntity;
+import com.lz_Insurance.persistence.entity.BaseJpaEntity;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseSpecification<T extends BaseDomainEntity> implements Specification<T> {
+public abstract class BaseSpecification<T extends BaseJpaEntity> implements Specification<T> {
 
     protected String id;
     protected String createdBy;
