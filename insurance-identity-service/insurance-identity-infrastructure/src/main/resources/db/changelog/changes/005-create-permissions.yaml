@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-permissions
+      author: identity
+      comment: Atomic capabilities expressed as resource:action with a default scope.
+      changes:
+        - createTable:
+            tableName: permissions
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+                  defaultValue: SYSTEM
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: VARCHAR(255)
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted_by
+                  type: VARCHAR(255)
+              - column:
+                  name: resource
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: default_scope
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: permissions
+            columnNames: resource, action
+            constraintName: uq_permissions_resource_action

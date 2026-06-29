@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-seed-permissions
+      author: identity
+      comment: >-
+        Permission catalog (one row per resource:action). default_scope is a
+        least-privilege baseline of OWN; the scope a role actually receives is
+        carried per-grant in role_permissions.granted_scope. Audit columns are
+        filled by table-level defaults.
+      changes:
+        - loadData:
+            tableName: permissions
+            file: db/changelog/data/permissions.csv
+            relativeToChangelogFile: false
+            usePreparedStatements: true
+            columns:
+              - column: {name: id, type: STRING}
+              - column: {name: resource, type: STRING}
+              - column: {name: action, type: STRING}
+              - column: {name: default_scope, type: STRING}

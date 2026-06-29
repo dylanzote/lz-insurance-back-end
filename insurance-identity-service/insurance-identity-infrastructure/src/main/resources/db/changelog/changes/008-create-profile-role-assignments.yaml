@@ -1,0 +1,80 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-create-profile-role-assignments
+      author: identity
+      comment: Assigns a role to an identity profile, optionally confined to a branch.
+      changes:
+        - createTable:
+            tableName: profile_role_assignments
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+                  defaultValue: SYSTEM
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: VARCHAR(255)
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted_by
+                  type: VARCHAR(255)
+              - column:
+                  name: identity_profile_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_profile_role_assignments_profile
+                    references: identity_profiles(id)
+              - column:
+                  name: role_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_profile_role_assignments_role
+                    references: system_roles(id)
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_profile_role_assignments_tenant
+                    references: tenants(id)
+              - column:
+                  name: branch_id
+                  type: VARCHAR(36)
+                  constraints:
+                    foreignKeyName: fk_profile_role_assignments_branch
+                    references: branches(id)
+        - addUniqueConstraint:
+            tableName: profile_role_assignments
+            columnNames: identity_profile_id, role_id, branch_id
+            constraintName: uq_profile_role_assignments_profile_role_branch

@@ -41,6 +41,19 @@ services:
     networks:
       - insurance-network
 
+  postgres-identity:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: identity_db
+      POSTGRES_USER: insurance
+      POSTGRES_PASSWORD: insurance123
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_identity_data:/var/lib/postgresql/data
+    networks:
+      - insurance-network
+
   # Redis for session management
   redis:
     image: redis:7-alpine
@@ -157,6 +170,7 @@ volumes:
   postgres_customer_data:
   postgres_product_data:
   postgres_policy_data:
+  postgres_identity_data:
   redis_data:
   minio_data:
   postgres_keycloak_data:

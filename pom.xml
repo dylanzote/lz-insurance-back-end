@@ -36,6 +36,10 @@
         <!-- lombok -->
         <lombok.version>1.18.42</lombok.version>
 
+        <!-- MapStruct -->
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+
         <!-- Spring Boot & Cloud -->
         <spring-boot.version>4.1.0</spring-boot.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
@@ -65,7 +69,6 @@
         <!-- Testing -->
         <testcontainers.version>2.0.4</testcontainers.version>
         <archunit.version>1.2.0</archunit.version>
-        <junit-jupiter.version>1.21.4</junit-jupiter.version>
 
         <!-- Plugins -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -88,6 +91,23 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- MapStruct (Entity <-> Domain mapping) -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-mapstruct-binding</artifactId>
+                <version>${lombok-mapstruct-binding.version}</version>
             </dependency>
 
             <!-- Spring Cloud BOM -->
@@ -151,44 +171,18 @@
                 <version>${mvel.version}</version>
             </dependency>
 
-            <!-- Testcontainers -->
+            <!-- Testcontainers — the BOM is the SINGLE source of versions for every
+                 org.testcontainers:testcontainers-* module (2.x relocated names). Do NOT add
+                 individual managed entries here: a versionless dependencyManagement entry shadows
+                 the BOM and breaks resolution ("version missing"); a versioned one re-introduces
+                 the skew this BOM exists to prevent. Declare the modules you need in each module's
+                 <dependencies> (no version) and let this BOM govern them. -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>${testcontainers.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- Individual Testcontainers modules for explicit version control -->
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${testcontainers.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>kafka</artifactId>
-                <version>${testcontainers.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>minio</artifactId>
-                <version>${testcontainers.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>redis</artifactId>
-                <version>${testcontainers.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit-jupiter.version}</version>
             </dependency>
 
             <!-- ArchUnit -->

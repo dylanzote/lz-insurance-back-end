@@ -1,7 +1,9 @@
 # insurance-identity-service — Service Context
 
-> This file is loaded when Claude works in the `insurance-identity-service` directory.
+> Loaded when Claude works in the `insurance-identity-service` directory.
 > Root `CLAUDE.md` is always loaded first — this file adds service-specific depth.
+> **This file reflects the ACTUAL state of the repo. Do not trust any status claim that
+> isn't verifiable in the code — inventory first, then act.**
 
 ---
 
@@ -18,125 +20,130 @@ Does NOT own: policy data, claims data, KYC business data, customer financials.
 
 ---
 
-## Maven Modules
+## Conventions (as they ACTUALLY are in the repo)
+- **Package root:** `com.lz_Insurance.insurance...` (capital `I` in `lz_Insurance`).
+  This is the dominant convention across domain, core, persistence, and api.
+  WARNING: One infra stub uses lowercase `com.lz_insurance` — match the capital-`I` form for all
+  new code. "Normalize all packages to lowercase" is a tracked cleanup (see `docs/known-gaps.md`),
+  NOT to be done mid-milestone.
+- **Base entity:** `BaseDomainEntity` lives in **insurance-core** (`com.lz_Insurance.core.model`),
+  NOT in insurance-persistence. It is a plain domain base — NOT JPA-mapped.
+- **JPA base (decided):** a separate `BaseJpaEntity` (`@MappedSuperclass`) lives in
+  **insurance-persistence**, mirroring the audit/id/version field-set. JPA entities extend it.
+  The two base classes intentionally duplicate the field-set across the architectural boundary —
+  each carries a cross-reference comment so nobody "fixes" the duplication by merging them.
+
+---
+
+## Maven Modules (hexagonal)
 ```
 insurance-identity-service/
-  insurance-identity-service-api/
-    com.lz_insurance.insurance.identity.api
-      controller/         # REST controllers (incoming adapters) ionterfaces
-      usecase/            # Use case implementations service of the controllers
-      dto/                # Request/Response DTOs
-      mapper/             # DTO ↔ Domain mappers
-      openapi/            # OpenAPI config
-  insurance-identity-service-domain/
-    com.lz_insurance.insurance.identity.domain
-      model/              # Domain entities 
-      port/
-        in/               # Use case interfaces (called by API)
-        out/              # Repository/external service interfaces (implemented by infra)
-      usecase/            # Use case implementations
-      support/            # support classes for usecases to avoid god classes
-      event/              # Domain events
-      exception/          # Domain exceptions
-      enum/               # Domain enumerations
-  insurance-identity-service-infrastructure/
-    com.lz_insurance.insurance.identity.infrastructure
-      persistence/
-        entity/           # JPA entities
-        repository/       # Spring Data JPA repos
-        adapter/          # Implements domain out-ports
-        specification/    # JPA Specifications
-      keycloak/           # Keycloak adapter (implements identity out-ports)
-      redis/              # Session/cache adapter
-      config/             # Spring config, security config
+  insurance-identity-api/            # Incoming ports: controllers, DTOs, OpenAPI
+    ...controller/         # REST controllers (incoming adapters) iterfaces with api documentation
+    ...usecase/            # Use case implementations service of the controllers
+    ...dto/                # Request/Response DTOs
+    ...mapper/             # DTO ↔ Domain mappers
+    ...openapi/            # OpenAPI config
+  insurance-identity-domain/         # Pure business logic — ZERO framework imports
+    .../domain/model/                # 10 domain models (extend core BaseDomainEntity)
+    .../domain/enumeration/          # 13 enums
+    .../domain/exception/            # 3 domain exceptions
+    .../domain/support/              # DomainGuard
+    .../domain/port/in/              # use case interfaces (next task) called by api 
+    .../domain/port/out/             # repository/external interfaces (next task)
+  insurance-identity-infrastructure/ # Adapters: JPA entities, repos, Keycloak, Redis, config
+    .../infrastructure/persistence/entity/        # JPA entities
+    .../infrastructure/persistence/repository/    # Spring Data repos
+    .../infrastructure/persistence/adapter/       # implements domain out-ports + MapStruct mappers
+    .../infrastructure/persistence/specification/ # JPA Specifications
+    src/main/resources/db/changelog/              # Liquibase (master + 001-010 tables, 011-013 seed)
 ```
 
 ---
 
-## Domain Enums (already implemented)
-- `ActorType`: INTERNAL, EXTERNAL
-- `IdentityStatus`: PENDING_APPROVAL, ACTIVE, SUSPENDED, DEACTIVATED
-- `InternalUserType`: STAFF, AGENT, UNDERWRITER, CLAIMS_ADJUSTER, BRANCH_MANAGER, TENANT_ADMIN
-- `ExternalUserType`: POLICYHOLDER, CLAIMANT, BENEFICIARY
-- `OrganizationScope`: OWN, BRANCH, ALL
-- `ApprovalStatus`: PENDING, APPROVED, REJECTED
-- `SessionStatus`: ACTIVE, EXPIRED, REVOKED
-- `PermissionAction`: CREATE, READ, UPDATE, DELETE, APPROVE, REJECT, EXPORT, CONFIGURE
-- `PermissionResource`: POLICY, CLAIM, REPORT, USER, BRANCH, TENANT, PERMISSION, SESSION, AUDIT
-- `RoleType`: SYSTEM (immutable defaults), CUSTOM (tenant-created)
+## Domain Layer — STATUS: COMPLETE
+- **10 domain models** — all extend core `BaseDomainEntity`, validate in constructor,
+  expose state via getters with NO public setters (invariants can't be bypassed).
+  State machines on `IdentityProfile`, `ApprovalRequest`, `SessionRegistry`;
+  HQ-no-parent rule on `Branch`; actorType <-> userType rule on `IdentityProfile`.
+- **`reconstitute(...)` factory on all 10 models** — PUBLIC static; rebuilds already-valid
+  stored state (id, version, current status, keycloakUserId, historical timestamps) with
+  STRUCTURAL validation only (no creation-time state rules re-applied). Constructors unchanged.
+- **13 enums** — ActorType, IdentityStatus, InternalUserType, ExternalUserType,
+  OrganizationScope, ApprovalStatus, SessionStatus, PermissionAction, PermissionResource,
+  RoleType, TenantStatus, BranchType, BranchStatus.
+- **3 exceptions** — DomainValidationException, InvalidStateTransitionException,
+  ApprovalAlreadyDecidedException (layered on core exception hierarchy).
+- **DomainGuard** — guard clauses throwing the domain exception type.
+- **49 unit tests passing** (41 original + 8 reconstitution round-trip), zero framework imports.
+
+DO NOT modify the domain module during persistence work unless a genuinely new capability
+is required (as reconstitution was) — and flag it before doing so.
 
 ---
 
-## Domain Model (M1 — to implement)
-Core entities in `domain/model/`:
-
-| Class | Key Fields |
+## Domain Models
+| Class | Notes |
 |---|---|
-| `Tenant` | id, name, code, country, bootstrapped, headquarterBranchId, status |
-| `Branch` | id, tenantId, parentBranchId, name, code, type, status |
-| `IdentityProfile` | id, tenantId, branchId, actorType, internalUserType/externalUserType, keycloakUserId, status |
-| `SystemRole` | id, name, roleType, description |
-| `Permission` | id, resource, action, defaultScope |
-| `RolePermission` | id, roleId, permissionId, grantedScope (junction — system defaults) |
-| `RolePermissionConfig` | id, tenantId, roleId, permissionId, grantedScope (tenant overrides) |
-| `ProfileRoleAssignment` | id, identityProfileId, roleId, tenantId, branchId |
-| `ApprovalRequest` | id, identityProfileId, requestedById, reviewedById, status, notes |
-| `SessionRegistry` | id, identityProfileId, tenantId, sessionToken, status, createdAt, expiresAt |
-
-All extend `BaseDomainEntity` from `insurance-persistence`.
+| `Tenant` | name, code(unique), country(ISO-2), bootstrapped, headquarterBranchId, status |
+| `Branch` | tenantId, parentBranchId(null=top), name, code, type, status. HQ has no parent. |
+| `IdentityProfile` | actorType, internal/externalUserType (mutually exclusive), keycloakUserId, status. State machine. |
+| `SystemRole` | name, roleType, description. WARNING: NO tenantId (see known-gaps). |
+| `Permission` | resource, action, defaultScope |
+| `RolePermission` | roleId, permissionId, grantedScope — system defaults |
+| `RolePermissionConfig` | tenantId, roleId, permissionId, grantedScope — tenant overrides |
+| `ProfileRoleAssignment` | identityProfileId, roleId, tenantId, branchId(null=tenant-wide) |
+| `ApprovalRequest` | identityProfileId, requestedById, reviewedById, status, notes. State machine. |
+| `SessionRegistry` | identityProfileId, sessionToken, status, expiresAt, lastActivityAt. isValid(). |
 
 ---
 
-## Liquibase Changelog Status (M1 — COMPLETED)
-All 15 changelogs written and structured:
-- `001` tenants table
-- `002` branches table
-- `003` identity_profiles table
-- `004` system_roles table
-- `005` permissions table
-- `006` role_permissions table
-- `007` role_permission_configs table
-- `008` profile_role_assignments table
-- `009` approval_requests table
-- `010` session_registry table
-- `011–015` seed data (roles, permissions, role-permission matrix)
+## Persistence Layer — STATUS: IN PROGRESS (current task, US-M1-007)
+**Liquibase changelogs DO NOT YET EXIST** — they are being authored now and become the schema
+source of truth (no "drift to flag" — both sides defined together).
 
-**Pre-production rule:** edit in place, do not add new changesets for corrections.
+Task scope:
+1. POM/config prerequisites — MapStruct + lombok-mapstruct-binding to root dependencyManagement;
+   infra pom deps (insurance-persistence, insurance-identity-domain, MapStruct, Testcontainers);
+   `BaseJpaEntity` in insurance-persistence; `postgres-identity` in docker-compose; datasource +
+   Liquibase config in application.properties.
+2. Liquibase changelogs — master + 001-010 (tables) + 011-013 (seed). YAML, snake_case, one
+   changeset per file. **Pre-production rule: edit in place, no new changesets for corrections.**
+3. JPA entities — one `{Model}Entity` per domain model, extend `BaseJpaEntity`, `@Enumerated(STRING)`,
+   data containers ONLY (zero business logic), mapped exactly to the changelog tables.
+4. MapStruct mappers — Domain->Entity via getters; Entity->Domain via `reconstitute(...)`.
+   Hand-written mappers (calling `reconstitute`) are the fallback if MapStruct can't target the
+   factory cleanly. NEVER BeanUtils (requires setters the domain deliberately lacks).
+
+**Seed data:** deterministic IDs (`perm-policy-read-own`, `role-agent-...`). The role->permission
+matrix is a business decision — seed the role/permission catalog, but the `role_permissions`
+junction is seeded ONLY from the matrix the product owner has explicitly approved.
 
 ---
 
-## Current Milestone: M1 — Foundation
+## NOT YET STARTED
+- Domain ports (in/out) + Spring Data repositories + adapters + Testcontainers IT (US-M1-008)
+- Boot verification + M1 exit gate (US-M1-009): app boots against docker-compose,
+  all changelogs apply, seed present, `/actuator/health` UP, coverage >= 80%
 
-### Completed
-- [x] Maven module structure
-- [x] Domain enums
-- [x] Liquibase changelog layer (all 15 files)
+---
 
-### In Progress / Next
-- [ ] Domain model classes (Tenant, Branch, IdentityProfile, SystemRole, Permission, etc.)
-- [ ] JPA entities (mirror domain models, mapped to DB schema)
-- [ ] Spring Data repositories (with Specification support)
-- [ ] Domain port interfaces (in/ and out/)
-- [ ] M1 exit gate: application boots, schema applied, seed data loaded, repositories pass integration tests
+## Known traps in shared modules (do not silently inherit)
+- `AuditLogListener` (insurance-persistence) duplicates `BaseDomainEntity`'s lifecycle and its
+  `preUpdate` does `getVersion()+1` -> **NPE on null version**. DO NOT attach this listener; rely
+  on `BaseDomainEntity`'s own `@PrePersist/@PreUpdate`. A `// FIXME` flags the NPE for later cleanup.
+- See `docs/known-gaps.md` for the full deferred list (package casing, SystemRole tenantId, etc.).
 
-### M1 Exit Gate (do not advance to M2 until ALL pass)
-1. `mvn clean install` passes with zero errors
-2. Liquibase applies all 15 changelogs cleanly on fresh Postgres
+---
+
+## M1 Exit Gate (do not advance to M2 until ALL pass)
+1. `mvn clean install` passes — zero errors
+2. All changelogs apply cleanly on fresh Postgres (Testcontainers)
 3. Seed data present and queryable
-4. All repository integration tests pass (Testcontainers)
-5. Code coverage ≥ 80% on domain module
+4. Domain + repository tests pass
+5. Coverage >= 80% on domain module
+6. App boots + `/actuator/health` UP
 
----
-
-## M1 User Stories Reference
-Load when needed: `@docs/identity-service/m1-user-stories.md`
-
----
-
-## Key Implementation Rules for This Service
-- `IdentityProfile` is the aggregate root for identity — all operations go through it
-- Bootstrap endpoint (`POST /internal/bootstrap`) must check `tenant.bootstrapped` before acting — idempotency guard
-- Approval workflow: branch managers approve internal registrations BEFORE Keycloak account is created
-- Never create Keycloak user until `ApprovalRequest` is in `APPROVED` state
-- `RolePermissionConfig` overrides are merged on top of `RolePermission` defaults at resolution time — defaults win if no override exists
-- All queries MUST go through Specification layer — never raw JPQL with tenant/branch filters hardcoded
+## Reference
+- `@docs/identity-service/m1-user-stories.md` — M1 acceptance criteria
+- `@docs/known-gaps.md` — deferred items that must not be lost

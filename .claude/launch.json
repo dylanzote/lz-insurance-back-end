@@ -1,0 +1,21 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "insurance-identity-service",
+      "runtimeExecutable": "mvn",
+      "runtimeArgs": [
+        "spring-boot:run",
+        "-pl",
+        "insurance-identity-service/insurance-identity-infrastructure"
+      ],
+      "port": 8080
+    },
+    {
+      "name": "infrastructure (docker-compose)",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up"],
+      "port": 8080
+    }
+  ]
+}
