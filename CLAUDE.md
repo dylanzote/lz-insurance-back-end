@@ -122,6 +122,19 @@ Create new shared modules only when a cross-cutting concern is clearly reusable 
 - Apply design patterns explicitly where they add clarity: Factory, Strategy, Builder, Specification, Observer, etc.
 - Name things for what they ARE, not what they DO generically (`BranchApprovalWorkflow`, not `WorkflowHandler`)
 
+### Logging (applies across all services)
+Governs where logging is applied — the M2 use-case layer is where it actually gets used.
+- **Where:** `@Slf4j` (Lombok) on use cases / application services and other decision or boundary
+  points (schedulers, message consumers, external-call gateways). NOT on pass-through
+  adapters, MapStruct mappers, or entities — logging in thin plumbing is noise.
+- **Levels:** `INFO` for meaningful business events (e.g. tenant bootstrapped, user approved);
+  `WARN`/`ERROR` for failures and recoverable anomalies; `DEBUG` for diagnostics.
+- **Always parameterized:** `log.info("Tenant {} bootstrapped by {}", tenantId, userId)` —
+  never string concatenation in the message.
+- **Never log sensitive data:** no passwords, tokens, full JWTs, or PII — compliance requirement
+  for Canada + Cameroon. Log ids and codes, not personal data.
+- **Never log-and-throw** the same error — log it OR throw it, let one layer own the outcome.
+
 ### Testing
 - **Unit tests:** every domain use case, every domain model method with logic, every utility
 - **Integration tests:** every REST endpoint (Spring Boot Test + Testcontainers for Postgres + Redis)
