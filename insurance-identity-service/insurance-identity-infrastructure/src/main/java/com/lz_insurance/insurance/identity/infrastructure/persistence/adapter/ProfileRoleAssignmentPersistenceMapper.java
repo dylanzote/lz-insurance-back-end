@@ -1,6 +1,6 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.model.ProfileRoleAssignment;
+import com.lz_insurance.insurance.identity.domain.model.ProfileRoleAssignment;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.ProfileRoleAssignmentEntity;
 import org.mapstruct.Mapper;
 

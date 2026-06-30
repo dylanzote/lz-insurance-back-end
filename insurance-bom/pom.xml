@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.lz_Insurance</groupId>
+        <groupId>com.lz_insurance</groupId>
         <artifactId>lz_insurance</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.lz_Insurance.bom</groupId>
+    <groupId>com.lz_insurance.bom</groupId>
     <artifactId>insurance-bom</artifactId>
 
     <name>Insurance BOM</name>
@@ -27,62 +27,62 @@
         <dependencies>
             <!-- Internal Library Versions -->
             <dependency>
-                <groupId>com.lz_Insurance.core</groupId>
+                <groupId>com.lz_insurance.core</groupId>
                 <artifactId>insurance-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.web</groupId>
+                <groupId>com.lz_insurance.web</groupId>
                 <artifactId>insurance-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.security.core</groupId>
+                <groupId>com.lz_insurance.security.core</groupId>
                 <artifactId>insurance-security-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.security.keycloak</groupId>
+                <groupId>com.lz_insurance.security.keycloak</groupId>
                 <artifactId>insurance-security-keycloak</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.security.multitenancy</groupId>
+                <groupId>com.lz_insurance.security.multitenancy</groupId>
                 <artifactId>insurance-security-multitenancy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.security.session</groupId>
+                <groupId>com.lz_insurance.security.session</groupId>
                 <artifactId>insurance-security-session</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.persistence</groupId>
+                <groupId>com.lz_insurance.persistence</groupId>
                 <artifactId>insurance-persistence</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.messaging</groupId>
+                <groupId>com.lz_insurance.messaging</groupId>
                 <artifactId>insurance-messaging</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.storage</groupId>
+                <groupId>com.lz_insurance.storage</groupId>
                 <artifactId>insurance-storage</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.monitoring</groupId>
+                <groupId>com.lz_insurance.monitoring</groupId>
                 <artifactId>insurance-monitoring</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.product.engine</groupId>
+                <groupId>com.lz_insurance.product.engine</groupId>
                 <artifactId>insurance-product-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.lz_Insurance.dto</groupId>
+                <groupId>com.lz_insurance.dto</groupId>
                 <artifactId>insurance-dto</artifactId>
                 <version>${project.version}</version>
             </dependency>

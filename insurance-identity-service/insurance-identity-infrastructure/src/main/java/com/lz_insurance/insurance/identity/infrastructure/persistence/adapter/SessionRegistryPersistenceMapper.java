@@ -1,6 +1,6 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.model.SessionRegistry;
+import com.lz_insurance.insurance.identity.domain.model.SessionRegistry;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.SessionRegistryEntity;
 import org.mapstruct.Mapper;
 

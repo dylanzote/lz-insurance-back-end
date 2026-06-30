@@ -1,6 +1,6 @@
 package com.lz_insurance.insurance.identity.infrastructure;
 
-import com.lz_Insurance.insurance.identity.domain.enumeration.TenantStatus;
+import com.lz_insurance.insurance.identity.domain.enumeration.TenantStatus;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.TenantEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.repository.TenantJpaRepository;
 import org.junit.jupiter.api.DisplayName;

@@ -21,12 +21,11 @@ Does NOT own: policy data, claims data, KYC business data, customer financials.
 ---
 
 ## Conventions (as they ACTUALLY are in the repo)
-- **Package root:** `com.lz_Insurance.insurance...` (capital `I` in `lz_Insurance`).
-  This is the dominant convention across domain, core, persistence, and api.
-  WARNING: One infra stub uses lowercase `com.lz_insurance` — match the capital-`I` form for all
-  new code. "Normalize all packages to lowercase" is a tracked cleanup (see `docs/known-gaps.md`),
-  NOT to be done mid-milestone.
-- **Base entity:** `BaseDomainEntity` lives in **insurance-core** (`com.lz_Insurance.core.model`),
+- **Package root:** `com.lz_insurance.insurance...` — all-lowercase, the ONLY convention.
+  The G-003 casing sweep (2026-06-30) normalized every package and Maven `groupId` to lowercase;
+  capital-`I` `com.lz_Insurance` no longer exists anywhere. Use lowercase `com.lz_insurance` for
+  all new code — no exceptions.
+- **Base entity:** `BaseDomainEntity` lives in **insurance-core** (`com.lz_insurance.core.model`),
   NOT in insurance-persistence. It is a plain domain base — NOT JPA-mapped.
 - **JPA base (decided):** a separate `BaseJpaEntity` (`@MappedSuperclass`) lives in
   **insurance-persistence**, mirroring the audit/id/version field-set. JPA entities extend it.

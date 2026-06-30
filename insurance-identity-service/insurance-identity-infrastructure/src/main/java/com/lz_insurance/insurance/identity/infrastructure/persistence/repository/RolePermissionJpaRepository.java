@@ -1,6 +1,6 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.repository;
 
-import com.lz_Insurance.persistence.repository.BaseRepository;
+import com.lz_insurance.persistence.repository.BaseRepository;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.RolePermissionEntity;
 import org.springframework.stereotype.Repository;
 

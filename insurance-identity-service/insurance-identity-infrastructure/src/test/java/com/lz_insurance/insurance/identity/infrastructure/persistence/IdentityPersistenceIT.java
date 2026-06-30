@@ -1,14 +1,14 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence;
 
-import com.lz_Insurance.insurance.identity.domain.enumeration.ActorType;
-import com.lz_Insurance.insurance.identity.domain.enumeration.BranchStatus;
-import com.lz_Insurance.insurance.identity.domain.enumeration.BranchType;
-import com.lz_Insurance.insurance.identity.domain.enumeration.IdentityStatus;
-import com.lz_Insurance.insurance.identity.domain.enumeration.InternalUserType;
-import com.lz_Insurance.insurance.identity.domain.enumeration.RoleType;
-import com.lz_Insurance.insurance.identity.domain.enumeration.TenantStatus;
-import com.lz_Insurance.persistence.config.JpaAuditingConfig;
-import com.lz_Insurance.security.core.service.CurrentUserService;
+import com.lz_insurance.insurance.identity.domain.enumeration.ActorType;
+import com.lz_insurance.insurance.identity.domain.enumeration.BranchStatus;
+import com.lz_insurance.insurance.identity.domain.enumeration.BranchType;
+import com.lz_insurance.insurance.identity.domain.enumeration.IdentityStatus;
+import com.lz_insurance.insurance.identity.domain.enumeration.InternalUserType;
+import com.lz_insurance.insurance.identity.domain.enumeration.RoleType;
+import com.lz_insurance.insurance.identity.domain.enumeration.TenantStatus;
+import com.lz_insurance.persistence.config.JpaAuditingConfig;
+import com.lz_insurance.security.core.service.CurrentUserService;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.BranchEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.IdentityProfileEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.PermissionEntity;

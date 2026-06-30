@@ -1,6 +1,6 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.model.IdentityProfile;
+import com.lz_insurance.insurance.identity.domain.model.IdentityProfile;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.IdentityProfileEntity;
 import org.mapstruct.Mapper;
 

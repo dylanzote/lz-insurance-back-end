@@ -1,8 +1,8 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.enumeration.BranchStatus;
-import com.lz_Insurance.insurance.identity.domain.enumeration.BranchType;
-import com.lz_Insurance.insurance.identity.domain.model.Branch;
+import com.lz_insurance.insurance.identity.domain.enumeration.BranchStatus;
+import com.lz_insurance.insurance.identity.domain.enumeration.BranchType;
+import com.lz_insurance.insurance.identity.domain.model.Branch;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.IdentityPersistenceIT;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.BranchEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.repository.BranchJpaRepository;

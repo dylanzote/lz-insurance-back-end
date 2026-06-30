@@ -1,10 +1,10 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.entity;
 
-import com.lz_Insurance.insurance.identity.domain.enumeration.ActorType;
-import com.lz_Insurance.insurance.identity.domain.enumeration.ExternalUserType;
-import com.lz_Insurance.insurance.identity.domain.enumeration.IdentityStatus;
-import com.lz_Insurance.insurance.identity.domain.enumeration.InternalUserType;
-import com.lz_Insurance.persistence.entity.BaseJpaEntity;
+import com.lz_insurance.insurance.identity.domain.enumeration.ActorType;
+import com.lz_insurance.insurance.identity.domain.enumeration.ExternalUserType;
+import com.lz_insurance.insurance.identity.domain.enumeration.IdentityStatus;
+import com.lz_insurance.insurance.identity.domain.enumeration.InternalUserType;
+import com.lz_insurance.persistence.entity.BaseJpaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

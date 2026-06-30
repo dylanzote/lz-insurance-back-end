@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.core.model.BaseDomainEntity;
-import com.lz_Insurance.persistence.entity.BaseJpaEntity;
+import com.lz_insurance.core.model.BaseDomainEntity;
+import com.lz_insurance.persistence.entity.BaseJpaEntity;
 
 /**
  * Copies the shared id/version/audit/soft-delete fields from a persisted entity onto a
