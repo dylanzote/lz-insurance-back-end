@@ -73,6 +73,7 @@
         <!-- Plugins -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <spotless-plugin.version>3.4.0</spotless-plugin.version>
     </properties>
 
@@ -243,6 +244,28 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <!-- Integration tests: Surefire runs unit tests (*Test); Failsafe runs *IT in the
+                 integration-test/verify phases. Declared here (not just pluginManagement) so it is
+                 inherited and ACTIVE for every module — every future service gets IT execution for
+                 free, no per-module wiring. Because `verify` precedes `install` in the Maven
+                 lifecycle, `mvn clean install` runs the ITs automatically (no separate command).
+                 These ITs are Testcontainers-backed and REQUIRE a running Docker daemon. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

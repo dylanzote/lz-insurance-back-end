@@ -121,10 +121,26 @@ junction is seeded ONLY from the matrix the product owner has explicitly approve
 
 ---
 
-## NOT YET STARTED
-- Domain ports (in/out) + Spring Data repositories + adapters + Testcontainers IT (US-M1-008)
-- Boot verification + M1 exit gate (US-M1-009): app boots against docker-compose,
-  all changelogs apply, seed present, `/actuator/health` UP, coverage >= 80%
+## STATUS — M1 COMPLETE (2026-06-29)
+- **US-M1-008 DONE:** domain out-ports + Spring Data repos + adapters + specifications +
+  Testcontainers ITs for all 10 aggregates.
+- **US-M1-009 DONE:** app boots against a real Postgres, all 13 changelogs apply, seed present,
+  JPA auditing active (`created_by` populated), `/actuator/health` UP. Wiring lives on
+  `InsuranceIdentityInfrastructureApplication`: `@Import(JpaAuditingConfig)` (targeted, not a scan
+  broaden — see G-009), servlet-security + `DataRedisAutoConfiguration` auto-configs excluded (no
+  auth/Redis until M3), actuator health exposed. Verified by `IdentityApplicationBootIT`.
+
+### Running integration tests (Failsafe — requires Docker)
+The repository/boot ITs are `*IT` and run via `maven-failsafe-plugin` (declared in the ROOT pom,
+inherited by all modules). Because `verify` precedes `install`, `mvn clean install` runs them
+automatically — they are **Testcontainers-backed and need a running Docker daemon**. The default
+`@SpringBootTest` `contextLoads` (Surefire) instead connects to the docker-compose `postgres-identity`
+on `localhost:5435`, so bring that container up before a full build (`docker compose up -d
+postgres-identity`).
+
+## NEXT — M2 (Internal User Lifecycle + Approval Workflow)
+- Domain in-ports (use-case interfaces) + API controllers/DTOs + use-case implementations.
+- Immediate cleanup candidate: the G-003 lowercase package sweep (its own commit/PR).
 
 ---
 
@@ -135,7 +151,9 @@ junction is seeded ONLY from the matrix the product owner has explicitly approve
   "SYSTEM" fallback). `@Version` handles optimistic locking. `BaseDomainEntity` is now framework-free
   (no JPA lifecycle). The old buggy `AuditLogListener` was DELETED (G-004). JPA auditing must be
   active wherever entities persist — `@DataJpaTest` slices `@Import(JpaAuditingConfig.class)` (G-007),
-  and the app itself does not yet load it (G-009).
+  and the running app loads it via an explicit `@Import` on the application class (G-009 RESOLVED in
+  US-M1-009). `auditorProvider` now takes `ObjectProvider<CurrentUserService>`, so it activates
+  without the security stack and falls back to `"SYSTEM"` when no `CurrentUserService` bean exists.
 - See `docs/known-gaps.md` for the full deferred list (package casing G-003, SystemRole tenantId G-001,
   app bean-wiring G-009, opt-in tenant isolation G-010, etc.).
 

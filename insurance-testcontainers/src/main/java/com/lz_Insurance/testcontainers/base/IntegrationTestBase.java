@@ -18,7 +18,7 @@ public abstract class IntegrationTestBase {
 
     @BeforeAll
     static void startContainers() {
-        postgres = new GenericContainer<>(DockerImageName.parse("postgres:15-alpine"))
+        postgres = new GenericContainer<>(DockerImageName.parse("postgres:16-alpine"))
             .withExposedPorts(5432)
             .withEnv("POSTGRES_DB", "insurance_test")
             .withEnv("POSTGRES_USER", "test")

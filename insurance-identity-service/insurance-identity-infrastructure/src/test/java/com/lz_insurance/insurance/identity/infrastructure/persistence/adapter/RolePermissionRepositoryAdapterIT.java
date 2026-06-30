@@ -28,7 +28,7 @@ class RolePermissionRepositoryAdapterIT extends IdentityPersistenceIT {
     @DisplayName("save then reload preserves id and grant scope")
     void saveThenReload_preservesIdentityAndAudit() {
         String roleId = persistSystemRole();
-        String permissionId = persistPermission();
+        String permissionId = seededPermissionId();
         RolePermission saved = adapter.save(new RolePermission(roleId, permissionId, OrganizationScope.BRANCH));
         flushAndClear();
 
@@ -46,7 +46,7 @@ class RolePermissionRepositoryAdapterIT extends IdentityPersistenceIT {
     @DisplayName("findByRoleId returns the role's grants")
     void findByRoleId_returnsGrants() {
         String roleId = persistSystemRole();
-        String permissionId = persistPermission();
+        String permissionId = seededPermissionId();
         adapter.save(new RolePermission(roleId, permissionId, OrganizationScope.OWN));
         flushAndClear();
 
@@ -58,7 +58,7 @@ class RolePermissionRepositoryAdapterIT extends IdentityPersistenceIT {
     @DisplayName("BaseSpecification filters by createdBy")
     void specification_filtersByCreatedBy() {
         String roleId = persistSystemRole();
-        String permissionId = persistPermission();
+        String permissionId = seededPermissionId();
         adapter.save(new RolePermission(roleId, permissionId, OrganizationScope.ALL));
         flushAndClear();
 

@@ -36,6 +36,12 @@ on case-insensitive filesystems (default on macOS).
 **Resolve by:** a dedicated cleanup task BETWEEN milestones (not mid-milestone). Normalize ALL
 packages to lowercase `com.lz_insurance` in one sweep, with a single refactor commit.
 **Interim rule:** match the dominant `com.lz_Insurance` for all new code until the sweep.
+**Update (2026-06-29, US-M1-009):** confirmed the boot blocker (G-009) does NOT require this sweep —
+auditing was wired with a targeted `@Import`, not scan-broadening, so the casing split no longer
+*breaks* anything. The sweep remains worthwhile cleanup and is the immediate next task (its own
+commit/PR, green build on each side). Scope measured: ~135 `.java` package decls, ~113 files with
+`com.lz_Insurance` imports (406 refs), 20 `pom.xml` (68 refs, incl. the `com.lz_Insurance` groupId),
+17 module source-root dirs (case-only renames on a case-insensitive FS).
 **Flagged:** during US-M1-007 persistence inventory.
 
 ### G-007 — JPA auditing must be active in @DataJpaTest slices
@@ -60,19 +66,20 @@ but these compile-time annotations remain.
 request/response DTOs and drop them from the domain base.
 **Flagged:** during the audit-mechanism cleanup (2026-06-29).
 
-### G-009 — Identity app component-scan misses the capital-I shared beans
-**What:** `InsuranceIdentityInfrastructureApplication` declares
-`@ComponentScan(basePackages = {"com.lz_insurance.insurance"})` (lowercase). Every shared module
-is capital-I `com.lz_Insurance.*` — including `JpaAuditingConfig` and `CurrentUserService`. So
-none of those beans are loaded by the running app: **JPA auditing is NOT active**, and after the
-G-004 cleanup nothing else populates `created_by`/`created_at` → every insert will fail the
-`NOT NULL` audit columns once the app boots against a real DB.
-**Impact:** The app cannot persist anything until shared infrastructure beans are wired. Repository
-*slice* tests are unaffected — they `@Import(JpaAuditingConfig.class)` explicitly (see G-007).
-**Resolve by:** US-M1-009 (boot verification). Broaden the scan (add `com.lz_Insurance` roots) or
-add explicit `@Import`s for the required shared configs, and ensure a `CurrentUserService` bean is
-available. Verify `created_by` is populated by a real insert. Relates to G-003 (package casing).
-**Flagged:** during US-M1-008 Tenant repository slice.
+### G-011 — "SYSTEM" auditor fallback is unreachable under a real security context
+**What:** `JpaAuditingConfig.auditorProvider` falls back to `"SYSTEM"` when `getCurrentUserId()`
+returns `null`. But `CurrentUserService.getCurrentUserId()` delegates to `AuthUser.anonymous()`,
+whose `userId` is the literal `"anonymous"` (never `null`). So once the security stack is wired
+(M3), an unauthenticated request would be audited as `"anonymous"`, and the `"SYSTEM"` Optional
+branch is dead code. (In M1 the fallback IS reached, because no `CurrentUserService` bean exists —
+the `ObjectProvider` resolves empty and the config returns `"SYSTEM"` directly.)
+**Impact:** Cosmetic in M1. In M3 system/bootstrap actions could be mis-attributed to `"anonymous"`
+instead of `"SYSTEM"`, and unauthenticated mutations would not be visibly distinguished.
+**Resolve by:** M3, when the security stack + `CurrentUserService` are wired. Decide the intended
+auditor for no-auth/bootstrap paths (likely make `getCurrentUserId()` return `null` when anonymous,
+or special-case bootstrap) and add a test that a real username — not `"SYSTEM"`/`"anonymous"` —
+lands in `created_by`.
+**Flagged:** during US-M1-009 boot verification.
 
 ### G-010 — Tenant isolation is OPT-IN until insurance-security-multitenancy is wired
 **What:** Tenant/branch predicates are applied only when a query explicitly uses
@@ -101,6 +108,44 @@ are considered FINAL for M1.
 ---
 
 ## Resolved
+
+### G-009 — Identity app component-scan misses the capital-I shared beans — RESOLVED 2026-06-29 (US-M1-009)
+**What:** `InsuranceIdentityInfrastructureApplication` scanned only lowercase
+`com.lz_insurance.insurance`, so the capital-I `JpaAuditingConfig`/`CurrentUserService` (and other
+shared beans, which also sit *outside* the `.insurance.` segment) were never loaded → JPA auditing
+inactive → `NOT NULL` `created_by`/`created_at` would fail on first insert.
+**Resolution:** Targeted wiring, NOT scan-broadening (broadening would have dragged in the whole
+unconfigured Keycloak/security stack — wrong for M1). `JpaAuditingConfig` is now pulled via an
+explicit `@Import` on the application class. Its `auditorProvider` was changed to take
+`ObjectProvider<CurrentUserService>` so auditing activates without a `CurrentUserService` bean,
+falling back to `"SYSTEM"` (see G-011). Spring Security is on the classpath transitively but unused
+in M1, so the servlet-security auto-configs (`SecurityAutoConfiguration`,
+`ServletWebSecurityAutoConfiguration`, `ManagementWebSecurityAutoConfiguration`,
+`UserDetailsServiceAutoConfiguration`) are excluded so `/actuator/health` stays open; Redis arrives
+transitively too, so `DataRedisAutoConfiguration` is excluded (no Redis until M3). Verified by
+`IdentityApplicationBootIT`: full context boots, all 13 changelogs apply, an insert succeeds with
+`created_by="SYSTEM"`, and `/actuator/health` returns UP without auth. Decoupled from G-003 (the
+casing sweep is no longer load-bearing).
+**Flagged:** during US-M1-008 Tenant repository slice.
+
+### Defects A & B — Repository ITs never executed / fixture collided with seed — RESOLVED 2026-06-29 (US-M1-009)
+**A — ITs not run by the build.** Maven Surefire's default patterns are `*Test`/`*Tests`; the
+repository ITs are named `*IT`, and there was no Failsafe plugin and no Surefire `<includes>`. So
+`mvn clean install` silently skipped all 10 persistence ITs — the "repository ITs pass" exit-gate
+item had never actually been exercised by the build (the prior memory claim that Surefire ran them
+was wrong). **Fix:** added `maven-failsafe-plugin` to the ROOT pom (`integration-test` + `verify`
+goals, default `*IT` convention), inherited by every module. Because `verify` precedes `install`,
+`mvn clean install` now runs ITs automatically (Testcontainers → requires Docker).
+**B — `persistPermission()` collided with seeded data.** The slice runs the full Liquibase master
+incl. seed 011–013, which inserts `perm-policy-read = POLICY/READ`. The shared fixture hardcoded a
+`POLICY/READ` insert → `duplicate key uq_permissions_resource_action` on every test that seeded a
+Permission (9 of 35 errored once they actually ran). **Fix:** FK-only callers now use
+`seededPermissionId()` (fetches a committed seed row) instead of inserting; the three
+creation-specific `PermissionRepositoryAdapterIT` tests use confirmed-unseeded resource/action
+combos, each guarded by a setup assertion that fails loudly if a future seed adds that combo.
+**Result:** full `mvn clean install` green — 49 domain + 1 infra context + 37 Failsafe IT methods
+(35 across 10 adapters + 2 boot).
+**Flagged:** during US-M1-009 boot verification.
 
 ### G-004 — AuditLogListener NPE on null version — RESOLVED 2026-06-29 (audit-mechanism cleanup)
 **What:** `AuditLogListener` (insurance-persistence) duplicated `BaseDomainEntity`'s lifecycle
