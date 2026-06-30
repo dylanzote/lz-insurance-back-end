@@ -27,23 +27,6 @@ user editing — a privilege-escalation risk if `user:update` is granted broadly
 whether to introduce a dedicated `permission`/`role` action for assignment.
 **Flagged:** during role->permission matrix review.
 
-### G-003 — Package casing split (com.lz_Insurance vs com.lz_insurance)
-**What:** The dominant package convention is `com.lz_Insurance` (capital `I`). One infrastructure
-stub uses lowercase `com.lz_insurance`. Two packages differing only by case is fragile, especially
-on case-insensitive filesystems (default on macOS).
-**Correct target:** all-lowercase `com.lz_insurance` is the proper Java convention.
-**Impact:** Potential build/classpath ambiguity; inconsistent codebase.
-**Resolve by:** a dedicated cleanup task BETWEEN milestones (not mid-milestone). Normalize ALL
-packages to lowercase `com.lz_insurance` in one sweep, with a single refactor commit.
-**Interim rule:** match the dominant `com.lz_Insurance` for all new code until the sweep.
-**Update (2026-06-29, US-M1-009):** confirmed the boot blocker (G-009) does NOT require this sweep —
-auditing was wired with a targeted `@Import`, not scan-broadening, so the casing split no longer
-*breaks* anything. The sweep remains worthwhile cleanup and is the immediate next task (its own
-commit/PR, green build on each side). Scope measured: ~135 `.java` package decls, ~113 files with
-`com.lz_Insurance` imports (406 refs), 20 `pom.xml` (68 refs, incl. the `com.lz_Insurance` groupId),
-17 module source-root dirs (case-only renames on a case-insensitive FS).
-**Flagged:** during US-M1-007 persistence inventory.
-
 ### G-007 — JPA auditing must be active in @DataJpaTest slices
 **What:** Audit fields are now populated by Spring Data JPA auditing (`@EnableJpaAuditing` in
 `JpaAuditingConfig` + `AuditingEntityListener` on `BaseJpaEntity`), not by hand-rolled lifecycle
@@ -120,6 +103,37 @@ are considered FINAL for M1.
 ---
 
 ## Resolved
+
+### G-003 — Package casing split (com.lz_Insurance vs com.lz_insurance) — RESOLVED 2026-06-30 (G-003 sweep)
+**What:** The codebase had two package roots differing only by case — the dominant capital-`I`
+`com.lz_Insurance` plus the lowercase `com.lz_insurance` used by `insurance-identity-infrastructure`.
+Two packages differing only by case is fragile on case-insensitive filesystems (macOS default).
+**Resolution:** A dedicated, isolated mechanical sweep (branch `feature/g003-package-casing-sweep`)
+normalized everything to all-lowercase `com.lz_insurance` — the proper Java convention. This is now
+the ONLY convention; capital-`I` `com.lz_Insurance` no longer exists anywhere in the codebase.
+**Scope executed (verified):**
+- **191 `.java` files** content-normalized (135 `package` decls + 115 with capital-`I` imports;
+  406 total refs). Included the already-lowercase infra module's 56 cross-module imports of
+  core/persistence/domain, which had to flip in lockstep.
+- **17 source-root directories** `com/lz_Insurance` → `com/lz_insurance` (the 2 infra source roots
+  were already lowercase and left untouched). On the case-insensitive FS the `git mv` two-step dance
+  reverted 10 files' working-tree content to the committed capital-`I` blob; recovered by re-running
+  the content replace against the physical tree (`find -exec sed`, since BSD `grep -r` was caching
+  the renamed-by-case dirs). Lesson: verify physical content after case-only renames, not via
+  `git grep`/`grep -r`.
+- **20 `pom.xml`** (68 refs): parent declarations, own `groupId`s, and dependency coordinates —
+  parent↔child consistency verified (incl. infra's deps on `…identity.api`/`…domain`/`persistence`).
+- Stale `capital-I` rationale scrubbed from `InsuranceIdentityInfrastructureApplication`'s Javadoc.
+**Wiring (re-evaluated, deliberately unchanged):** the targeted `@Import(JpaAuditingConfig.class)`
+on the application class was NEVER a casing workaround — `com.lz_insurance.persistence` sits outside
+the `com.lz_insurance.insurance` component-scan root, and broadening the scan would drag in the
+unconfigured Keycloak/security stack (see G-009). It stays targeted; **M3 (real security wiring) is
+the natural point to revisit `@Import` vs. broadened scan**, not now.
+**Verification:** `mvn clean install` (Docker up) green — all 20 modules build, 49 domain tests +
+37 Failsafe ITs (35 adapters + 2 boot) pass, JaCoCo "All coverage checks have been met". Zero
+capital-`I` `lz_Insurance` remains anywhere (incl. `target/`). The G-012 JaCoCo/Java-26 log noise
+is unrelated and still cosmetic.
+**Flagged:** during US-M1-007 persistence inventory.
 
 ### G-009 — Identity app component-scan misses the capital-I shared beans — RESOLVED 2026-06-29 (US-M1-009)
 **What:** `InsuranceIdentityInfrastructureApplication` scanned only lowercase

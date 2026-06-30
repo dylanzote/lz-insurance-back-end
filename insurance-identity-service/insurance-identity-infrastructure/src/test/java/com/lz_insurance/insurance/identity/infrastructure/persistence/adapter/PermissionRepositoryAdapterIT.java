@@ -1,9 +1,9 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.enumeration.OrganizationScope;
-import com.lz_Insurance.insurance.identity.domain.enumeration.PermissionAction;
-import com.lz_Insurance.insurance.identity.domain.enumeration.PermissionResource;
-import com.lz_Insurance.insurance.identity.domain.model.Permission;
+import com.lz_insurance.insurance.identity.domain.enumeration.OrganizationScope;
+import com.lz_insurance.insurance.identity.domain.enumeration.PermissionAction;
+import com.lz_insurance.insurance.identity.domain.enumeration.PermissionResource;
+import com.lz_insurance.insurance.identity.domain.model.Permission;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.IdentityPersistenceIT;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.PermissionEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.repository.PermissionJpaRepository;

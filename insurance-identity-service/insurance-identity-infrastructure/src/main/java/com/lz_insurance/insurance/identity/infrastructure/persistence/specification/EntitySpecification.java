@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.specification;
 
-import com.lz_Insurance.persistence.entity.BaseJpaEntity;
-import com.lz_Insurance.persistence.specification.BaseSpecification;
+import com.lz_insurance.persistence.entity.BaseJpaEntity;
+import com.lz_insurance.persistence.specification.BaseSpecification;
 
 /**
  * Concrete, instantiable {@link BaseSpecification} for entities that carry no tenant scope

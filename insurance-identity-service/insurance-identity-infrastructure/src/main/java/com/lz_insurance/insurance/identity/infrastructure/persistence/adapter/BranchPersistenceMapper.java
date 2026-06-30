@@ -1,6 +1,6 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.model.Branch;
+import com.lz_insurance.insurance.identity.domain.model.Branch;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.BranchEntity;
 import org.mapstruct.Mapper;
 

@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.model.Tenant;
-import com.lz_Insurance.insurance.identity.domain.port.out.TenantRepository;
+import com.lz_insurance.insurance.identity.domain.model.Tenant;
+import com.lz_insurance.insurance.identity.domain.port.out.TenantRepository;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.TenantEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.repository.TenantJpaRepository;
 import lombok.RequiredArgsConstructor;

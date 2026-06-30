@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.enumeration.ApprovalStatus;
-import com.lz_Insurance.insurance.identity.domain.model.ApprovalRequest;
+import com.lz_insurance.insurance.identity.domain.enumeration.ApprovalStatus;
+import com.lz_insurance.insurance.identity.domain.model.ApprovalRequest;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.IdentityPersistenceIT;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.ApprovalRequestEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.repository.ApprovalRequestJpaRepository;

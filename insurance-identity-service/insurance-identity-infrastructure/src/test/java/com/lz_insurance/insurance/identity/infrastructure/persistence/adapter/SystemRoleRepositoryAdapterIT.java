@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_Insurance.insurance.identity.domain.enumeration.RoleType;
-import com.lz_Insurance.insurance.identity.domain.model.SystemRole;
+import com.lz_insurance.insurance.identity.domain.enumeration.RoleType;
+import com.lz_insurance.insurance.identity.domain.model.SystemRole;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.IdentityPersistenceIT;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.SystemRoleEntity;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.repository.SystemRoleJpaRepository;
