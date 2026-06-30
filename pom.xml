@@ -74,6 +74,7 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
+        <jacoco-plugin.version>0.8.13</jacoco-plugin.version>
         <spotless-plugin.version>3.4.0</spotless-plugin.version>
     </properties>
 
@@ -242,6 +243,12 @@
                         </java>
                     </configuration>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-plugin.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -261,6 +268,29 @@
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- JaCoCo coverage: active for every module. prepare-agent feeds the test runners;
+                 report renders target/site/jacoco on `verify` (so `mvn clean install` produces it).
+                 The >=80% enforcement rule lives in insurance-identity-domain (the M1 exit gate). -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jacoco-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>

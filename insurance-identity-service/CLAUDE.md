@@ -159,13 +159,19 @@ postgres-identity`).
 
 ---
 
-## M1 Exit Gate (do not advance to M2 until ALL pass)
-1. `mvn clean install` passes — zero errors
-2. All changelogs apply cleanly on fresh Postgres (Testcontainers)
-3. Seed data present and queryable
-4. Domain + repository tests pass
-5. Coverage >= 80% on domain module
-6. App boots + `/actuator/health` UP
+## M1 Exit Gate — ALL PASS (verified 2026-06-29)
+1. [x] `mvn clean install` passes — zero errors (Docker daemon + compose `postgres-identity` up)
+2. [x] All 13 changelogs apply cleanly on a fresh Postgres (Testcontainers, per IT class)
+3. [x] Seed data present and queryable (31 permissions, 9 system roles, grant matrix)
+4. [x] Domain + repository tests pass — 49 domain (Surefire) + 37 IT (Failsafe: 35 across 10
+   adapters + 2 boot) + 1 infra contextLoads
+5. [x] Coverage >= 80% on domain module — **97.8% line** (enforced, `haltOnFailure=true`); see
+   G-012 for a JDK-26/JaCoCo log-noise caveat (cosmetic)
+6. [x] App boots + `/actuator/health` UP — proven by `IdentityApplicationBootIT` (also asserts
+   `created_by="SYSTEM"` on a real insert)
+
+Deferred (do not block M1, tracked in `docs/known-gaps.md`): G-001, G-002, G-003 (lowercase sweep —
+next task), G-005, G-008, G-010, G-011, G-012.
 
 ## Reference
 - `@docs/identity-service/m1-user-stories.md` — M1 acceptance criteria
