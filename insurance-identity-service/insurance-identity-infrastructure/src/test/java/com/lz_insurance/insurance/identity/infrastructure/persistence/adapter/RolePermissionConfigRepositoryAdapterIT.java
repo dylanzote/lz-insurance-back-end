@@ -29,7 +29,7 @@ class RolePermissionConfigRepositoryAdapterIT extends IdentityPersistenceIT {
     void saveThenReload_preservesIdentityAndAudit() {
         String tenantId = persistTenant();
         String roleId = persistSystemRole();
-        String permissionId = persistPermission();
+        String permissionId = seededPermissionId();
         RolePermissionConfig saved = adapter.save(new RolePermissionConfig(tenantId, roleId, permissionId, OrganizationScope.ALL));
         flushAndClear();
 
@@ -48,7 +48,7 @@ class RolePermissionConfigRepositoryAdapterIT extends IdentityPersistenceIT {
     void findByTenantIdAndRoleId_returnsOverrides() {
         String tenantId = persistTenant();
         String roleId = persistSystemRole();
-        String permissionId = persistPermission();
+        String permissionId = seededPermissionId();
         adapter.save(new RolePermissionConfig(tenantId, roleId, permissionId, OrganizationScope.OWN));
         flushAndClear();
 
@@ -61,7 +61,7 @@ class RolePermissionConfigRepositoryAdapterIT extends IdentityPersistenceIT {
     void tenantScopedSpecification_filtersByTenant() {
         String tenantId = persistTenant();
         String roleId = persistSystemRole();
-        String permissionId = persistPermission();
+        String permissionId = seededPermissionId();
         adapter.save(new RolePermissionConfig(tenantId, roleId, permissionId, OrganizationScope.BRANCH));
         flushAndClear();
 

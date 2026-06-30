@@ -5,9 +5,6 @@ import com.lz_Insurance.insurance.identity.domain.enumeration.BranchStatus;
 import com.lz_Insurance.insurance.identity.domain.enumeration.BranchType;
 import com.lz_Insurance.insurance.identity.domain.enumeration.IdentityStatus;
 import com.lz_Insurance.insurance.identity.domain.enumeration.InternalUserType;
-import com.lz_Insurance.insurance.identity.domain.enumeration.OrganizationScope;
-import com.lz_Insurance.insurance.identity.domain.enumeration.PermissionAction;
-import com.lz_Insurance.insurance.identity.domain.enumeration.PermissionResource;
 import com.lz_Insurance.insurance.identity.domain.enumeration.RoleType;
 import com.lz_Insurance.insurance.identity.domain.enumeration.TenantStatus;
 import com.lz_Insurance.persistence.config.JpaAuditingConfig;
@@ -32,6 +29,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.mockito.BDDMockito.given;
@@ -135,12 +133,23 @@ public abstract class IdentityPersistenceIT {
         return role.getId();
     }
 
-    protected String persistPermission() {
-        PermissionEntity permission = PermissionEntity.builder()
-                .resource(PermissionResource.POLICY).action(PermissionAction.READ)
-                .defaultScope(OrganizationScope.OWN).build();
-        entityManager.persist(permission);
-        entityManager.flush();
-        return permission.getId();
+    /**
+     * Returns the id of an existing Liquibase-seeded {@link PermissionEntity}, for use as a
+     * foreign-key parent. A Permission's {@code (resource, action)} natural key is a small enum
+     * space fully covered by the seed (011-seed-permissions), so inserting a fresh fixture row
+     * collides with {@code uq_permissions_resource_action}. Tests that merely need "some valid
+     * permission" to satisfy an FK reuse a committed seed row instead of inserting one.
+     */
+    protected String seededPermissionId() {
+        List<PermissionEntity> seeded = entityManager.getEntityManager()
+                .createQuery("select p from PermissionEntity p", PermissionEntity.class)
+                .setMaxResults(1)
+                .getResultList();
+        if (seeded.isEmpty()) {
+            throw new IllegalStateException(
+                    "Expected Liquibase seed (011-seed-permissions) to provide at least one Permission "
+                            + "for FK fixtures, but none were found.");
+        }
+        return seeded.getFirst().getId();
     }
 }
