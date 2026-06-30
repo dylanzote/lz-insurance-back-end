@@ -81,6 +81,18 @@ or special-case bootstrap) and add a test that a real username — not `"SYSTEM"
 lands in `created_by`.
 **Flagged:** during US-M1-009 boot verification.
 
+### G-012 — JaCoCo 0.8.13 can't instrument Java 26 classes (Maven runs on JDK 26)
+**What:** `java` on PATH is Temurin 25.0.3, but Maven runs on Homebrew OpenJDK 26.0.1, so the
+forked test JVM is Java 26 (class-file major 70). JaCoCo 0.8.13 supports up to Java 25 (major 69),
+so it logs `IllegalClassFormatException: Unsupported class file major version 70` when the boot IT's
+JDK `HttpClient` triggers instrumentation of `jdk.internal.net.http.*` runtime classes.
+**Impact:** Cosmetic only. It is JDK-internal classes that fail — never project code. Our modules
+compile to target 25 (major 69) and instrument fine; domain coverage measured cleanly at 97.8%.
+The build is green. Just noisy logs in `insurance-identity-infrastructure`.
+**Resolve by:** when JaCoCo ships Java 26 support (bump `jacoco-plugin.version`), or pin Maven to
+run on JDK 25 (`JAVA_HOME`), or exclude the boot IT's JDK-internal instrumentation. Low priority.
+**Flagged:** during US-M1-009 JaCoCo wiring.
+
 ### G-010 — Tenant isolation is OPT-IN until insurance-security-multitenancy is wired
 **What:** Tenant/branch predicates are applied only when a query explicitly uses
 `TenantScopedSpecification` (`withTenantId`/`withBranchId`). `BaseSpecification` has no tenant
@@ -146,6 +158,19 @@ combos, each guarded by a setup assertion that fails loudly if a future seed add
 **Result:** full `mvn clean install` green — 49 domain + 1 infra context + 37 Failsafe IT methods
 (35 across 10 adapters + 2 boot).
 **Flagged:** during US-M1-009 boot verification.
+
+### JaCoCo coverage gate — WIRED & MEASURED 2026-06-29 (US-M1-009 / M1 close)
+**What:** `coverage >= 80%, enforced via JaCoCo` was referenced everywhere (root CLAUDE.md,
+m1-user-stories, exit gate) but the plugin did not exist in any pom — the gate had never been
+measured.
+**Resolution:** Added `jacoco-maven-plugin` to the ROOT pom (pluginManagement + active:
+`prepare-agent` + `report` on `verify`), inherited by all modules — `mvn clean install` now emits
+`target/site/jacoco`. A check rule on `insurance-identity-domain` enforces **>= 80% LINE coverage**
+(`element=BUNDLE`, `haltOnFailure=true`). Measured actual: **97.8% line** (354/362), 98.3%
+instruction, 91.7% branch, 96.0% method — well clear of the floor, so enforcement was turned on
+build-failing immediately. Lowest classes are two tiny exception types and `DomainGuard`; not padded
+with trivial tests (per policy). See G-012 for a JDK-26/JaCoCo log-noise caveat.
+**Flagged:** during M1 exit-gate review.
 
 ### G-004 — AuditLogListener NPE on null version — RESOLVED 2026-06-29 (audit-mechanism cleanup)
 **What:** `AuditLogListener` (insurance-persistence) duplicated `BaseDomainEntity`'s lifecycle
