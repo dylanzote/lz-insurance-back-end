@@ -26,6 +26,12 @@ import lombok.ToString;
  * <p>Lifecycle: a profile is born PENDING_APPROVAL with no Keycloak account. It is
  * {@link #activate(String) activated} (Keycloak user attached) only after approval,
  * then may be {@link #suspend() suspended} / {@link #deactivate() deactivated}.
+ *
+ * <p>First-login password change is enforced by the domain, NOT the identity provider:
+ * {@link #activate(String)} raises {@link #passwordChangeRequired}, and only a successful
+ * {@link #completePasswordChange()} through our own flow clears it. Login (M3) must withhold a full
+ * session while the flag is set. This keeps enforcement provider-independent — swapping identity
+ * providers cannot silently drop it.
  */
 @Getter
 @ToString(callSuper = true)
@@ -42,6 +48,7 @@ public class IdentityProfile extends BaseDomainEntity {
 
     private String keycloakUserId;
     private IdentityStatus status;
+    private boolean passwordChangeRequired;
 
     private IdentityProfile(String tenantId, String branchId, ActorType actorType,
                             InternalUserType internalUserType, ExternalUserType externalUserType,
@@ -83,7 +90,8 @@ public class IdentityProfile extends BaseDomainEntity {
     private IdentityProfile(String tenantId, String branchId, ActorType actorType,
                             InternalUserType internalUserType, ExternalUserType externalUserType,
                             String email, String firstName, String lastName,
-                            String keycloakUserId, IdentityStatus status) {
+                            String keycloakUserId, IdentityStatus status,
+                            boolean passwordChangeRequired) {
         DomainGuard.notBlank(tenantId, "tenantId");
         DomainGuard.notNull(actorType, "actorType");
         DomainGuard.notBlank(email, "email");
@@ -112,6 +120,7 @@ public class IdentityProfile extends BaseDomainEntity {
         this.lastName = lastName;
         this.keycloakUserId = keycloakUserId;
         this.status = status;
+        this.passwordChangeRequired = passwordChangeRequired;
     }
 
     /** Factory for an internal staff member, scoped to a branch. */
@@ -136,21 +145,42 @@ public class IdentityProfile extends BaseDomainEntity {
                                                InternalUserType internalUserType,
                                                ExternalUserType externalUserType, String email,
                                                String firstName, String lastName,
-                                               String keycloakUserId, IdentityStatus status) {
+                                               String keycloakUserId, IdentityStatus status,
+                                               boolean passwordChangeRequired) {
         return new IdentityProfile(tenantId, branchId, actorType, internalUserType, externalUserType,
-                email, firstName, lastName, keycloakUserId, status);
+                email, firstName, lastName, keycloakUserId, status, passwordChangeRequired);
     }
 
     /**
      * Attaches the Keycloak account and moves the profile live.
      * Valid only from PENDING_APPROVAL — a Keycloak user is never created before
      * approval, so re-activation of an already-active profile is illegal.
+     *
+     * <p>Activation raises {@link #passwordChangeRequired}: a freshly activated staff member must
+     * change their temporary credential through our own flow before receiving a full session. The
+     * domain owns this rule; the identity provider is not trusted to enforce it.
      */
     public void activate(String keycloakUserId) {
         DomainGuard.notBlank(keycloakUserId, "keycloakUserId");
         requireStatus(IdentityStatus.PENDING_APPROVAL, IdentityStatus.ACTIVE);
         this.keycloakUserId = keycloakUserId;
         this.status = IdentityStatus.ACTIVE;
+        this.passwordChangeRequired = true;
+    }
+
+    /**
+     * Clears the forced-password-change flag once the user has successfully changed their credential
+     * through our own password-change flow (which owns MFA/policy/current-password checks and only
+     * then calls the identity provider). Valid only for an ACTIVE profile that still has a pending
+     * change — calling it otherwise is an illegal transition.
+     */
+    public void completePasswordChange() {
+        if (status != IdentityStatus.ACTIVE || !passwordChangeRequired) {
+            throw new InvalidStateTransitionException(
+                    "completePasswordChange requires an ACTIVE profile with a pending password change (status=%s, passwordChangeRequired=%s)"
+                            .formatted(status, passwordChangeRequired));
+        }
+        this.passwordChangeRequired = false;
     }
 
     /** ACTIVE -> SUSPENDED. */

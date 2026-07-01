@@ -57,4 +57,7 @@ public class IdentityProfileEntity extends BaseJpaEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 32)
     private IdentityStatus status;
+
+    @Column(name = "password_change_required", nullable = false)
+    private boolean passwordChangeRequired;
 }

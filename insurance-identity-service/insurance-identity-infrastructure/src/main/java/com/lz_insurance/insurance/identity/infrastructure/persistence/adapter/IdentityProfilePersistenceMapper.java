@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 /**
  * Maps {@link IdentityProfile} &harr; {@link IdentityProfileEntity}.
  * Entity&rarr;Domain rebuilds through {@code IdentityProfile.reconstitute(...)}, which enforces the
- * INTERNAL/EXTERNAL structural invariants and restores status + keycloakUserId.
+ * INTERNAL/EXTERNAL structural invariants and restores status + keycloakUserId + passwordChangeRequired.
  */
 @Mapper(componentModel = "spring")
 public interface IdentityProfilePersistenceMapper extends BaseFieldsMapper {
@@ -28,7 +28,8 @@ public interface IdentityProfilePersistenceMapper extends BaseFieldsMapper {
                 entity.getFirstName(),
                 entity.getLastName(),
                 entity.getKeycloakUserId(),
-                entity.getStatus());
+                entity.getStatus(),
+                entity.isPasswordChangeRequired());
         applyBaseFields(entity, domain);
         return domain;
     }

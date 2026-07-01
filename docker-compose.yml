@@ -107,17 +107,19 @@ services:
     networks:
       - insurance-network
 
-  # Keycloak for authentication
+  # Keycloak for authentication. 26.x matches keycloak-admin-client 26.0.8 used by
+  # insurance-security-keycloak (US-M2-001). Keycloak 26 renamed the bootstrap admin env vars
+  # to KC_BOOTSTRAP_ADMIN_USERNAME / KC_BOOTSTRAP_ADMIN_PASSWORD.
   keycloak:
-    image: quay.io/keycloak/keycloak:23.0.4
+    image: quay.io/keycloak/keycloak:26.0.8
     command: start-dev
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres-keycloak:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: keycloak123
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin123
     ports:
       - "8080:8080"
     depends_on:

@@ -72,12 +72,13 @@ class ReconstitutionTest {
     void identityProfileInternal() {
         IdentityProfile profile = IdentityProfile.reconstitute("tenant-1", "branch-1", ActorType.INTERNAL,
                 InternalUserType.AGENT, null, "agent@lz.test", "Ada", "Lovelace",
-                "kc-123", IdentityStatus.ACTIVE);
+                "kc-123", IdentityStatus.ACTIVE, true);
 
         assertThat(profile.getStatus()).isEqualTo(IdentityStatus.ACTIVE);
         assertThat(profile.getKeycloakUserId()).isEqualTo("kc-123");
         assertThat(profile.getInternalUserType()).isEqualTo(InternalUserType.AGENT);
         assertThat(profile.getExternalUserType()).isNull();
+        assertThat(profile.isPasswordChangeRequired()).isTrue();
     }
 
     @Test
@@ -85,11 +86,12 @@ class ReconstitutionTest {
     void identityProfileExternal() {
         IdentityProfile profile = IdentityProfile.reconstitute("tenant-1", null, ActorType.EXTERNAL,
                 null, ExternalUserType.POLICYHOLDER, "ph@lz.test", "Grace", "Hopper",
-                null, IdentityStatus.PENDING_APPROVAL);
+                null, IdentityStatus.PENDING_APPROVAL, false);
 
         assertThat(profile.getExternalUserType()).isEqualTo(ExternalUserType.POLICYHOLDER);
         assertThat(profile.getBranchId()).isNull();
         assertThat(profile.getKeycloakUserId()).isNull();
+        assertThat(profile.isPasswordChangeRequired()).isFalse();
     }
 
     @Test
