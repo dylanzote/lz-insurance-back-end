@@ -29,7 +29,8 @@ public interface IdentityProfilePersistenceMapper extends BaseFieldsMapper {
                 entity.getLastName(),
                 entity.getKeycloakUserId(),
                 entity.getStatus(),
-                entity.isPasswordChangeRequired());
+                entity.isPasswordChangeRequired(),
+                entity.getCurrentPasswordHash());
         applyBaseFields(entity, domain);
         return domain;
     }

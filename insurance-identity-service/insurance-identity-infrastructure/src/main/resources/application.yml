@@ -1,0 +1,31 @@
+spring:
+  profiles:
+    include: keycloak
+  application:
+    name: identity-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5435/identity_db
+    username: insurance
+    password: insurance123
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+# Bootstrap ceremony (US-M2-002): shared secret for POST /identity/bootstrap (NOT JWT).
+# Override via BOOTSTRAP_SECRET in every real environment; the default is for local dev only.
+identity:
+  bootstrap:
+    secret: ${BOOTSTRAP_SECRET:changeme-dev}
+
+server:
+  port: 8080

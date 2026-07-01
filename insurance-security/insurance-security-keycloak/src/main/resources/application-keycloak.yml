@@ -1,8 +1,7 @@
-# Activate Keycloak profile
-spring:
-  profiles:
-    active: keycloak
-
+# Keycloak profile config. This file is loaded when the `keycloak` profile is active (a service
+# opts in via `spring.profiles.include: keycloak`). It must NOT declare `spring.profiles.active`
+# here — `spring.profiles.active` is illegal inside a profile-specific document (Boot 2.4+) and
+# fails context startup.
 
 # Security configuration
 insurance:

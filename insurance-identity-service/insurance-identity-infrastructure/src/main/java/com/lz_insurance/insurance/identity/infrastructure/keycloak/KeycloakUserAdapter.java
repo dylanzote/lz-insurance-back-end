@@ -2,8 +2,8 @@ package com.lz_insurance.insurance.identity.infrastructure.keycloak;
 
 import com.lz_insurance.insurance.identity.domain.exception.IdentityProviderException;
 import com.lz_insurance.insurance.identity.domain.port.out.KeycloakUserPort;
-import com.lz_insurance.insurance.identity.domain.port.out.KeycloakUserRegistration;
-import com.lz_insurance.insurance.identity.domain.port.out.KeycloakUserUpdate;
+import com.lz_insurance.insurance.identity.domain.dto.KeycloakUserRegistration;
+import com.lz_insurance.insurance.identity.domain.dto.KeycloakUserUpdate;
 import com.lz_insurance.security.core.model.AuthUser;
 import com.lz_insurance.security.core.spi.CreateUserRequest;
 import com.lz_insurance.security.core.spi.IdentityProvider;
@@ -53,8 +53,7 @@ public class KeycloakUserAdapter implements KeycloakUserPort {
 
     @Override
     public void assignRealmRole(String keycloakUserId, String roleName) {
-        run(() -> identityProvider.assignRole(keycloakUserId, roleName),
-                "assign role %s to user %s".formatted(roleName, keycloakUserId));
+        run(() -> identityProvider.assignRole(keycloakUserId, roleName), "assign role %s to user %s".formatted(roleName, keycloakUserId));
     }
 
     @Override
@@ -67,20 +66,17 @@ public class KeycloakUserAdapter implements KeycloakUserPort {
                 .enabled(update.enabled())
                 .build();
 
-        call(() -> identityProvider.updateUser(keycloakUserId, request),
-                "update user " + keycloakUserId);
+        call(() -> identityProvider.updateUser(keycloakUserId, request), "update user " + keycloakUserId);
     }
 
     @Override
     public void changePassword(String keycloakUserId, String newPassword, boolean temporary) {
-        run(() -> identityProvider.changePassword(keycloakUserId, newPassword, temporary),
-                "change password for user " + keycloakUserId);
+        run(() -> identityProvider.changePassword(keycloakUserId, newPassword, temporary), "change password for user " + keycloakUserId);
     }
 
     @Override
     public void deleteUser(String keycloakUserId) {
-        run(() -> identityProvider.deleteUser(keycloakUserId),
-                "delete user " + keycloakUserId);
+        run(() -> identityProvider.deleteUser(keycloakUserId), "delete user " + keycloakUserId);
     }
 
     private <T> T call(Supplier<T> operation, String description) {

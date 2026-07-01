@@ -75,6 +75,11 @@ The build is green. Just noisy logs in `insurance-identity-infrastructure`.
 **Resolve by:** when JaCoCo ships Java 26 support (bump `jacoco-plugin.version`), or pin Maven to
 run on JDK 25 (`JAVA_HOME`), or exclude the boot IT's JDK-internal instrumentation. Low priority.
 **Flagged:** during US-M1-009 JaCoCo wiring.
+**Update (US-M2-002):** the same log noise now also appears in the DOMAIN Surefire run — the first
+mock-based domain tests (`BootstrapTenantUseCaseImplTest`) make Mockito generate mock classes at
+Java-26 class-file level, which JaCoCo 0.8.13 cannot instrument. Still cosmetic: the failure is on
+Mockito's generated proxies, never project code; all tests pass and the domain coverage gate still
+measures real classes and stays green.
 
 ### G-010 — Tenant isolation is OPT-IN until insurance-security-multitenancy is wired
 **What:** Tenant/branch predicates are applied only when a query explicitly uses
@@ -126,6 +131,39 @@ account but emit no email. First-login forced password change still works (enfor
 wiring, or a dedicated notification milestone). Emit `TenantBootstrapped` / `UserActivated` events; the
 notification module renders and sends.
 **Flagged:** during US-M2-001 Keycloak port + adapter.
+
+### G-015 — Endpoint permission enforcement is inert until M3
+**What:** `@RequiresPermission` uses Spring Security's `@PreAuthorize`, which only fires when Method
+Security (`@EnableMethodSecurity`) is active. The identity app deliberately excludes the whole
+security stack in M1/M2 (`SecurityAutoConfiguration` et al. excluded on the application class), so
+`@PreAuthorize` — and therefore every `@RequiresPermission` — is a NO-OP. Endpoints annotated for
+permissions are currently unprotected.
+**Impact:** In M2 the protected endpoints (US-M2-003..007) enforce NO authorization at runtime; any
+caller can invoke them. `POST /internal/bootstrap` is the exception — it is gated by the
+`X-Bootstrap-Secret` header, not JWT, so it IS protected. M2 integration tests therefore assert
+business flows only, NOT 401/403-via-permission (such a test would pass for the wrong reason).
+**Interim handling:** annotate every protected endpoint with `@RequiresPermission` anyway so the
+gates light up automatically once security is wired; do not write M2 tests asserting 403 for
+unauthorized callers.
+**Resolve by:** M3, when `insurance-security-keycloak` JWT validation + `@EnableMethodSecurity` +
+`TenantContext` population are wired. Then add the 401 (invalid token) and 403 (insufficient scope)
+tests the M2/M3 stories call for.
+**Flagged:** during US-M2-002 (bootstrap endpoint) API-layer wiring.
+
+### G-016 — PasswordHistory + LoginAttempt domain models not yet built (reuse prevention + lockout)
+**What:** `docs/user-journeys.md` mandates OUR-system-owned password reuse prevention (cannot reuse
+the last 5 passwords) and account lockout (lock after 5 failed attempts), plus password expiry
+(`passwordLastChangedAt`, 90-day window). These need two domain models that do not exist yet:
+`PasswordHistory` (hashed previous credentials per profile) and `LoginAttempt` (failed-attempt
+tracking per profile). `PasswordPolicy` (added in US-M2-002) currently enforces COMPLEXITY only
+(length + character classes).
+**Impact:** Bootstrap/approval/change flows validate complexity before calling Keycloak, but reuse,
+expiry and lockout are NOT enforced. Acceptable for M2 (bootstrap uses a fresh operator-supplied
+password; no history exists) — but these are real security rules that must land before production
+auth traffic.
+**Resolve by:** M6 (per user-journeys UJ-004/UJ-005). Add `PasswordHistory` + `LoginAttempt` models,
+persist hashed history on every change, wire reuse/expiry/lockout into the password + login flows.
+**Flagged:** during US-M2-002 password-policy introduction.
 
 ---
 

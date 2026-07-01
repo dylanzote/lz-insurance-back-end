@@ -40,4 +40,9 @@ public class IdentityProfileRepositoryAdapter implements IdentityProfileReposito
     public Optional<IdentityProfile> findByTenantIdAndEmail(String tenantId, String email) {
         return jpaRepository.findByTenantIdAndEmailAndDeletedFalse(tenantId, email).map(mapper::toDomain);
     }
+
+    @Override
+    public void deleteById(String id) {
+        jpaRepository.deleteById(id);
+    }
 }

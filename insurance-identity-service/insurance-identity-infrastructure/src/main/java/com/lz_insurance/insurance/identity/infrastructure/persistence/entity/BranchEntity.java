@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.entity;
 
-import com.lz_insurance.insurance.identity.domain.enumeration.BranchStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.BranchType;
+import com.lz_insurance.insurance.identity.domain.enums.BranchStatus;
+import com.lz_insurance.insurance.identity.domain.enums.BranchType;
 import com.lz_insurance.persistence.entity.BaseJpaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,9 +1,9 @@
 package com.lz_insurance.insurance.identity.domain.model;
 
-import com.lz_insurance.insurance.identity.domain.enumeration.OrganizationScope;
-import com.lz_insurance.insurance.identity.domain.enumeration.PermissionAction;
-import com.lz_insurance.insurance.identity.domain.enumeration.PermissionResource;
-import com.lz_insurance.insurance.identity.domain.enumeration.RoleType;
+import com.lz_insurance.insurance.identity.domain.enums.OrganizationScope;
+import com.lz_insurance.insurance.identity.domain.enums.PermissionAction;
+import com.lz_insurance.insurance.identity.domain.enums.PermissionResource;
+import com.lz_insurance.insurance.identity.domain.enums.RoleType;
 import com.lz_insurance.insurance.identity.domain.exception.DomainValidationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -41,4 +41,9 @@ public class TenantRepositoryAdapter implements TenantRepository {
     public Optional<Tenant> findByCode(String code) {
         return jpaRepository.findByCodeAndDeletedFalse(code).map(mapper::toDomain);
     }
+
+    @Override
+    public void deleteById(String id) {
+        jpaRepository.deleteById(id);
+    }
 }

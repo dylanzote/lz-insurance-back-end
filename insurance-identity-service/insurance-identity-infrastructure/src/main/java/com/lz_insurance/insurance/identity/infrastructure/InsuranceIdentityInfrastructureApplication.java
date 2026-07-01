@@ -1,6 +1,7 @@
 package com.lz_insurance.insurance.identity.infrastructure;
 
 import com.lz_insurance.persistence.config.JpaAuditingConfig;
+import com.lz_insurance.web.advice.GlobalControllerAdvice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
@@ -35,6 +36,12 @@ import org.springframework.context.annotation.Import;
  * so Boot would auto-configure a Redis client + health indicator pointing at localhost — which
  * fails health (503) since no Redis is wired in M1. {@code DataRedisAutoConfiguration} is
  * excluded; Redis is introduced with session management in M3.
+ *
+ * <p><b>Error handling (M2):</b> the shared {@link GlobalControllerAdvice} lives in
+ * {@code com.lz_insurance.web.advice}, outside the {@code com.lz_insurance.insurance} scan root, so
+ * it is registered via the same targeted {@code @Import}. Without it, domain exceptions would fall
+ * through to Boot's whitelabel page instead of the standard {@code ErrorResponse} shape (with the
+ * correct 400/403/404/409 status per {@code ErrorCode}).
  */
 @SpringBootApplication(exclude = {
         SecurityAutoConfiguration.class,
@@ -44,7 +51,7 @@ import org.springframework.context.annotation.Import;
         DataRedisAutoConfiguration.class
 })
 @ComponentScan(basePackages = {"com.lz_insurance.insurance"})
-@Import(JpaAuditingConfig.class)
+@Import({JpaAuditingConfig.class, GlobalControllerAdvice.class})
 public class InsuranceIdentityInfrastructureApplication {
 
     public static void main(String[] args) {

@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.domain.exception;
 
 import com.lz_insurance.core.exception.FunctionalException;
-import com.lz_insurance.insurance.identity.domain.enumeration.ApprovalStatus;
+import com.lz_insurance.insurance.identity.domain.enums.ApprovalStatus;
 
 /**
  * Raised when {@code approve()} or {@code reject()} is invoked on an

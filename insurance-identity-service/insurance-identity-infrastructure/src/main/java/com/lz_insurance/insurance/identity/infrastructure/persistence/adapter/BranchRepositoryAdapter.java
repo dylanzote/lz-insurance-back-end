@@ -41,4 +41,9 @@ public class BranchRepositoryAdapter implements BranchRepository {
     public List<Branch> findByTenantId(String tenantId) {
         return jpaRepository.findByTenantIdAndDeletedFalse(tenantId).stream().map(mapper::toDomain).toList();
     }
+
+    @Override
+    public void deleteById(String id) {
+        jpaRepository.deleteById(id);
+    }
 }

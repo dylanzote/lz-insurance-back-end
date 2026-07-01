@@ -1,4 +1,4 @@
-package com.lz_insurance.insurance.identity.domain.enumeration;
+package com.lz_insurance.insurance.identity.domain.enums;
 
 /**
  * State of an {@code ApprovalRequest}. PENDING is the only non-terminal state.

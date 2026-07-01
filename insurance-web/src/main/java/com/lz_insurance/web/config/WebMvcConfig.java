@@ -1,12 +1,15 @@
 package com.lz_insurance.web.config;
 
+import com.lz_insurance.web.context.RequestContextArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -16,6 +19,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         "http://localhost:8080",
         "http://localhost:4200"
     };
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        // Lets any controller declare RequestContext as a plain parameter (see the resolver's javadoc).
+        resolvers.add(new RequestContextArgumentResolver());
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

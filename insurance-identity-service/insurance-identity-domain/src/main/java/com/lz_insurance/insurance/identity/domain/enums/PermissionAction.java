@@ -1,4 +1,4 @@
-package com.lz_insurance.insurance.identity.domain.enumeration;
+package com.lz_insurance.insurance.identity.domain.enums;
 
 /**
  * The action half of a {@code resource:action:dataScope} permission.

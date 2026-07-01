@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.adapter;
 
-import com.lz_insurance.insurance.identity.domain.enumeration.BranchStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.BranchType;
+import com.lz_insurance.insurance.identity.domain.enums.BranchStatus;
+import com.lz_insurance.insurance.identity.domain.enums.BranchType;
 import com.lz_insurance.insurance.identity.domain.model.Branch;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.IdentityPersistenceIT;
 import com.lz_insurance.insurance.identity.infrastructure.persistence.entity.BranchEntity;
