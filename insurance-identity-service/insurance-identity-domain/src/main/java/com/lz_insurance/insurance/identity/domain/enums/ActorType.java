@@ -1,4 +1,4 @@
-package com.lz_insurance.insurance.identity.domain.enumeration;
+package com.lz_insurance.insurance.identity.domain.enums;
 
 /**
  * Discriminator that tells every downstream service how to treat an identity.

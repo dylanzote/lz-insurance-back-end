@@ -1,8 +1,8 @@
 package com.lz_insurance.insurance.identity.infrastructure.keycloak;
 
 import com.lz_insurance.insurance.identity.domain.exception.IdentityProviderException;
-import com.lz_insurance.insurance.identity.domain.port.out.KeycloakUserRegistration;
-import com.lz_insurance.insurance.identity.domain.port.out.KeycloakUserUpdate;
+import com.lz_insurance.insurance.identity.domain.dto.KeycloakUserRegistration;
+import com.lz_insurance.insurance.identity.domain.dto.KeycloakUserUpdate;
 import com.lz_insurance.security.keycloak.mapper.KeyCloakUserMapper;
 import com.lz_insurance.security.keycloak.model.KeycloakProperties;
 import com.lz_insurance.security.keycloak.service.KeyCloakService;

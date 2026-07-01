@@ -1,4 +1,4 @@
-package com.lz_insurance.insurance.identity.domain.enumeration;
+package com.lz_insurance.insurance.identity.domain.enums;
 
 /**
  * Position of a branch in the organizational hierarchy.

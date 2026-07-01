@@ -103,6 +103,9 @@ databaseChangeLog:
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
+              - column:
+                  name: current_password_hash
+                  type: VARCHAR(255)
         - addUniqueConstraint:
             tableName: identity_profiles
             columnNames: tenant_id, email

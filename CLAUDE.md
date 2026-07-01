@@ -199,5 +199,10 @@ open insurance-identity-service/target/site/jacoco/index.html
 ## Reference Docs (load on demand)
 - `@docs/architecture.md` — full system architecture, all services, data flow
 - `@docs/roadmap.md` — milestone breakdown, exit gates, delivery order
+- `@docs/user-journeys.md` — intended UX for key flows; **authoritative** — implementation is
+  derived from these journeys, never the reverse. Defines Keycloak's exact role (credential store +
+  token issuer only; OUR domain owns every business rule — password policy, reuse, lockout, MFA,
+  sessions) and the password policy. Read before implementing any auth/password flow.
 - `@docs/identity-service/m1-user-stories.md` — M1 acceptance criteria for insurance-identity-service
+- `@docs/identity-service/m2-m3-user-stories.md` — M2/M3 acceptance criteria
 - `@docs/identity-service/domain-model.md` — entity list, relationships, enums

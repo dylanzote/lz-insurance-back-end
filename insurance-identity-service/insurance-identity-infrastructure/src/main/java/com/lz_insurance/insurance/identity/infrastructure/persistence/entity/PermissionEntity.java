@@ -1,8 +1,8 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.entity;
 
-import com.lz_insurance.insurance.identity.domain.enumeration.OrganizationScope;
-import com.lz_insurance.insurance.identity.domain.enumeration.PermissionAction;
-import com.lz_insurance.insurance.identity.domain.enumeration.PermissionResource;
+import com.lz_insurance.insurance.identity.domain.enums.OrganizationScope;
+import com.lz_insurance.insurance.identity.domain.enums.PermissionAction;
+import com.lz_insurance.insurance.identity.domain.enums.PermissionResource;
 import com.lz_insurance.persistence.entity.BaseJpaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

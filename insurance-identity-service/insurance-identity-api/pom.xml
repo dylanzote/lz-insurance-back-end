@@ -18,4 +18,78 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!-- Domain in-ports (use-case interfaces) + command/result records the controllers call -->
+        <dependency>
+            <groupId>com.lz_insurance.insurance.identity.domain</groupId>
+            <artifactId>insurance-identity-domain</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Standard response/error shapes + GlobalControllerAdvice + ApiResponse/ErrorResponse.
+             Brings spring-web / spring-webmvc (via springdoc) transitively for the controllers. -->
+        <dependency>
+            <groupId>com.lz_insurance.web</groupId>
+            <artifactId>insurance-web</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Bean Validation: annotations (@Valid/@NotBlank/@Email) AND the Hibernate Validator
+             provider so @Valid @RequestBody is actually enforced at runtime. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- MapStruct: DTO <-> domain mappers arrive with the richer M2 stories (US-M2-003+).
+             Declared now so the processor path is in place; bootstrap maps inline (trivial). -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Annotation processors: Lombok + MapStruct (+ binding so MapStruct sees
+                 Lombok-generated accessors). Overrides the parent's lombok-only path, so all
+                 three must be listed here (mirrors insurance-identity-infrastructure). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

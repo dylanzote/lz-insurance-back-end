@@ -1,9 +1,9 @@
 package com.lz_insurance.insurance.identity.infrastructure.persistence.entity;
 
-import com.lz_insurance.insurance.identity.domain.enumeration.ActorType;
-import com.lz_insurance.insurance.identity.domain.enumeration.ExternalUserType;
-import com.lz_insurance.insurance.identity.domain.enumeration.IdentityStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.InternalUserType;
+import com.lz_insurance.insurance.identity.domain.enums.ActorType;
+import com.lz_insurance.insurance.identity.domain.enums.ExternalUserType;
+import com.lz_insurance.insurance.identity.domain.enums.IdentityStatus;
+import com.lz_insurance.insurance.identity.domain.enums.InternalUserType;
 import com.lz_insurance.persistence.entity.BaseJpaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,4 +60,7 @@ public class IdentityProfileEntity extends BaseJpaEntity {
 
     @Column(name = "password_change_required", nullable = false)
     private boolean passwordChangeRequired;
+
+    @Column(name = "current_password_hash")
+    private String currentPasswordHash;
 }

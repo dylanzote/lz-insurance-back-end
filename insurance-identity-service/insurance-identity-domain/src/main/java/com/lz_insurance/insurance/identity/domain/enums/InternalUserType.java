@@ -1,4 +1,4 @@
-package com.lz_insurance.insurance.identity.domain.enumeration;
+package com.lz_insurance.insurance.identity.domain.enums;
 
 /**
  * Sub-type of an INTERNAL actor (staff). Null for EXTERNAL actors.

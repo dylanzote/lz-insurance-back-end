@@ -1,6 +1,6 @@
 package com.lz_insurance.insurance.identity.domain.model;
 
-import com.lz_insurance.insurance.identity.domain.enumeration.SessionStatus;
+import com.lz_insurance.insurance.identity.domain.enums.SessionStatus;
 import com.lz_insurance.insurance.identity.domain.exception.DomainValidationException;
 import com.lz_insurance.insurance.identity.domain.exception.InvalidStateTransitionException;
 import org.junit.jupiter.api.DisplayName;

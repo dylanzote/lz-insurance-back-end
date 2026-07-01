@@ -1,18 +1,18 @@
 package com.lz_insurance.insurance.identity.domain.model;
 
-import com.lz_insurance.insurance.identity.domain.enumeration.ActorType;
-import com.lz_insurance.insurance.identity.domain.enumeration.ApprovalStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.BranchStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.BranchType;
-import com.lz_insurance.insurance.identity.domain.enumeration.ExternalUserType;
-import com.lz_insurance.insurance.identity.domain.enumeration.IdentityStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.InternalUserType;
-import com.lz_insurance.insurance.identity.domain.enumeration.OrganizationScope;
-import com.lz_insurance.insurance.identity.domain.enumeration.PermissionAction;
-import com.lz_insurance.insurance.identity.domain.enumeration.PermissionResource;
-import com.lz_insurance.insurance.identity.domain.enumeration.RoleType;
-import com.lz_insurance.insurance.identity.domain.enumeration.SessionStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.TenantStatus;
+import com.lz_insurance.insurance.identity.domain.enums.ActorType;
+import com.lz_insurance.insurance.identity.domain.enums.ApprovalStatus;
+import com.lz_insurance.insurance.identity.domain.enums.BranchStatus;
+import com.lz_insurance.insurance.identity.domain.enums.BranchType;
+import com.lz_insurance.insurance.identity.domain.enums.ExternalUserType;
+import com.lz_insurance.insurance.identity.domain.enums.IdentityStatus;
+import com.lz_insurance.insurance.identity.domain.enums.InternalUserType;
+import com.lz_insurance.insurance.identity.domain.enums.OrganizationScope;
+import com.lz_insurance.insurance.identity.domain.enums.PermissionAction;
+import com.lz_insurance.insurance.identity.domain.enums.PermissionResource;
+import com.lz_insurance.insurance.identity.domain.enums.RoleType;
+import com.lz_insurance.insurance.identity.domain.enums.SessionStatus;
+import com.lz_insurance.insurance.identity.domain.enums.TenantStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -72,13 +72,14 @@ class ReconstitutionTest {
     void identityProfileInternal() {
         IdentityProfile profile = IdentityProfile.reconstitute("tenant-1", "branch-1", ActorType.INTERNAL,
                 InternalUserType.AGENT, null, "agent@lz.test", "Ada", "Lovelace",
-                "kc-123", IdentityStatus.ACTIVE, true);
+                "kc-123", IdentityStatus.ACTIVE, true, "hashed-temp");
 
         assertThat(profile.getStatus()).isEqualTo(IdentityStatus.ACTIVE);
         assertThat(profile.getKeycloakUserId()).isEqualTo("kc-123");
         assertThat(profile.getInternalUserType()).isEqualTo(InternalUserType.AGENT);
         assertThat(profile.getExternalUserType()).isNull();
         assertThat(profile.isPasswordChangeRequired()).isTrue();
+        assertThat(profile.getCurrentPasswordHash()).isEqualTo("hashed-temp");
     }
 
     @Test
@@ -86,7 +87,7 @@ class ReconstitutionTest {
     void identityProfileExternal() {
         IdentityProfile profile = IdentityProfile.reconstitute("tenant-1", null, ActorType.EXTERNAL,
                 null, ExternalUserType.POLICYHOLDER, "ph@lz.test", "Grace", "Hopper",
-                null, IdentityStatus.PENDING_APPROVAL, false);
+                null, IdentityStatus.PENDING_APPROVAL, false, null);
 
         assertThat(profile.getExternalUserType()).isEqualTo(ExternalUserType.POLICYHOLDER);
         assertThat(profile.getBranchId()).isNull();

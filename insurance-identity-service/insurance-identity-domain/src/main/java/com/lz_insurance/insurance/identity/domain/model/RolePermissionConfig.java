@@ -1,7 +1,7 @@
 package com.lz_insurance.insurance.identity.domain.model;
 
 import com.lz_insurance.core.model.BaseDomainEntity;
-import com.lz_insurance.insurance.identity.domain.enumeration.OrganizationScope;
+import com.lz_insurance.insurance.identity.domain.enums.OrganizationScope;
 import com.lz_insurance.insurance.identity.domain.support.DomainGuard;
 import lombok.Getter;
 import lombok.ToString;

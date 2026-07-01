@@ -1,10 +1,10 @@
 package com.lz_insurance.insurance.identity.domain.model;
 
 import com.lz_insurance.core.model.BaseDomainEntity;
-import com.lz_insurance.insurance.identity.domain.enumeration.ActorType;
-import com.lz_insurance.insurance.identity.domain.enumeration.ExternalUserType;
-import com.lz_insurance.insurance.identity.domain.enumeration.IdentityStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.InternalUserType;
+import com.lz_insurance.insurance.identity.domain.enums.ActorType;
+import com.lz_insurance.insurance.identity.domain.enums.ExternalUserType;
+import com.lz_insurance.insurance.identity.domain.enums.IdentityStatus;
+import com.lz_insurance.insurance.identity.domain.enums.InternalUserType;
 import com.lz_insurance.insurance.identity.domain.exception.InvalidStateTransitionException;
 import com.lz_insurance.insurance.identity.domain.support.DomainGuard;
 import lombok.Getter;
@@ -50,6 +50,13 @@ public class IdentityProfile extends BaseDomainEntity {
     private IdentityStatus status;
     private boolean passwordChangeRequired;
 
+    /**
+     * BCrypt hash of the current credential — OUR system's authoritative copy (Keycloak keeps its
+     * own for authentication). Set whenever the password changes: the generated temporary credential
+     * at bootstrap/approval, then again at forced/subsequent change. Never holds a raw password.
+     */
+    private String currentPasswordHash;
+
     private IdentityProfile(String tenantId, String branchId, ActorType actorType,
                             InternalUserType internalUserType, ExternalUserType externalUserType,
                             String email, String firstName, String lastName) {
@@ -91,7 +98,7 @@ public class IdentityProfile extends BaseDomainEntity {
                             InternalUserType internalUserType, ExternalUserType externalUserType,
                             String email, String firstName, String lastName,
                             String keycloakUserId, IdentityStatus status,
-                            boolean passwordChangeRequired) {
+                            boolean passwordChangeRequired, String currentPasswordHash) {
         DomainGuard.notBlank(tenantId, "tenantId");
         DomainGuard.notNull(actorType, "actorType");
         DomainGuard.notBlank(email, "email");
@@ -121,13 +128,12 @@ public class IdentityProfile extends BaseDomainEntity {
         this.keycloakUserId = keycloakUserId;
         this.status = status;
         this.passwordChangeRequired = passwordChangeRequired;
+        this.currentPasswordHash = currentPasswordHash;
     }
 
     /** Factory for an internal staff member, scoped to a branch. */
-    public static IdentityProfile internal(String tenantId, String branchId, InternalUserType type,
-                                           String email, String firstName, String lastName) {
-        return new IdentityProfile(tenantId, branchId, ActorType.INTERNAL, type, null,
-                email, firstName, lastName);
+    public static IdentityProfile internal(String tenantId, String branchId, InternalUserType type, String email, String firstName, String lastName) {
+        return new IdentityProfile(tenantId, branchId, ActorType.INTERNAL, type, null, email, firstName, lastName);
     }
 
     /** Factory for an external customer; branch is optional. */
@@ -146,9 +152,19 @@ public class IdentityProfile extends BaseDomainEntity {
                                                ExternalUserType externalUserType, String email,
                                                String firstName, String lastName,
                                                String keycloakUserId, IdentityStatus status,
-                                               boolean passwordChangeRequired) {
+                                               boolean passwordChangeRequired, String currentPasswordHash) {
         return new IdentityProfile(tenantId, branchId, actorType, internalUserType, externalUserType,
-                email, firstName, lastName, keycloakUserId, status, passwordChangeRequired);
+                email, firstName, lastName, keycloakUserId, status, passwordChangeRequired, currentPasswordHash);
+    }
+
+    /**
+     * Records the hash of the current credential — OUR authoritative copy, updated in lockstep with
+     * every password set (temporary at bootstrap/approval, then forced/subsequent change). The raw
+     * password is hashed by the caller through the {@code PasswordHasher} port; only the hash arrives.
+     */
+    public void updatePasswordHash(String passwordHash) {
+        DomainGuard.notBlank(passwordHash, "passwordHash");
+        this.currentPasswordHash = passwordHash;
     }
 
     /**

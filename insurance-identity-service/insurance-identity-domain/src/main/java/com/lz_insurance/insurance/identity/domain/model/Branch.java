@@ -1,8 +1,8 @@
 package com.lz_insurance.insurance.identity.domain.model;
 
 import com.lz_insurance.core.model.BaseDomainEntity;
-import com.lz_insurance.insurance.identity.domain.enumeration.BranchStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.BranchType;
+import com.lz_insurance.insurance.identity.domain.enums.BranchStatus;
+import com.lz_insurance.insurance.identity.domain.enums.BranchType;
 import com.lz_insurance.insurance.identity.domain.support.DomainGuard;
 import lombok.Getter;
 import lombok.ToString;

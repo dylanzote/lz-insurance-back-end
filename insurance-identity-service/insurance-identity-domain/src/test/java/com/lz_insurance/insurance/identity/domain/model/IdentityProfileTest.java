@@ -1,8 +1,8 @@
 package com.lz_insurance.insurance.identity.domain.model;
 
-import com.lz_insurance.insurance.identity.domain.enumeration.ExternalUserType;
-import com.lz_insurance.insurance.identity.domain.enumeration.IdentityStatus;
-import com.lz_insurance.insurance.identity.domain.enumeration.InternalUserType;
+import com.lz_insurance.insurance.identity.domain.enums.ExternalUserType;
+import com.lz_insurance.insurance.identity.domain.enums.IdentityStatus;
+import com.lz_insurance.insurance.identity.domain.enums.InternalUserType;
 import com.lz_insurance.insurance.identity.domain.exception.DomainValidationException;
 import com.lz_insurance.insurance.identity.domain.exception.InvalidStateTransitionException;
 import org.junit.jupiter.api.DisplayName;
