@@ -100,6 +100,33 @@ and correct the matrix then. The identity-owned grants (user/branch/tenant/permi
 are considered FINAL for M1.
 **Flagged:** during role->permission matrix review.
 
+### G-013 — Keycloak integration is single-realm; external realm not addressable
+**What:** The root architecture mandates TWO realms (`lz-insurance-internal`, `lz-insurance-external`).
+The shared `insurance-security-keycloak` module is single-realm: `KeyCloakConfig` builds one `Keycloak`
+admin client bound to `keycloak.realm`, and `KeyCloakService` navigates `keycloak.realm(props.getRealm())`
+for every operation. In US-M2-001 the identity service points that single realm at `lz-insurance-internal`.
+**Impact:** No code path can currently provision/manage users in the EXTERNAL realm. Fine for M2 —
+the entire Internal User Lifecycle milestone operates only on internal staff.
+**Resolve by:** M3, when external self-registration (US-M3) and external self-service password reset
+(US-M3-007) land. Options: two admin-client beans (internal/external) selected by `actorType`, or realm
+routing in the shared module. Decide then.
+**Flagged:** during US-M2-001 Keycloak port + adapter.
+
+### G-014 — Welcome / activation emails are not yet emitted (notification-service owns them)
+**What:** The M2 bootstrap (US-M2-002) and approval (US-M2-004) stories call for a "welcome"/"activation"
+email. That delivery is a notification-service concern (domain event → notification module), NOT a
+Keycloak responsibility. The `KeycloakUserPort` deliberately has NO `sendPasswordResetEmail`; Keycloak is
+only the credential store. First-login forced password change is enforced by the DOMAIN
+(`IdentityProfile.passwordChangeRequired`), not by a Keycloak required-action — so no `requiredActions`
+plumbing exists (the earlier `CreateUserRequest`/`KeyCloakUser` addition was reverted).
+**Impact:** Until the notification module + domain events exist, bootstrap/approval complete the Keycloak
+account but emit no email. First-login forced password change still works (enforced by the domain via
+`IdentityProfile.passwordChangeRequired`), so the flow is functional without the email.
+**Resolve by:** when `insurance-notification` + the identity domain events are built (M2 bootstrap/approval
+wiring, or a dedicated notification milestone). Emit `TenantBootstrapped` / `UserActivated` events; the
+notification module renders and sends.
+**Flagged:** during US-M2-001 Keycloak port + adapter.
+
 ---
 
 ## Resolved

@@ -97,6 +97,12 @@ databaseChangeLog:
                   type: VARCHAR(32)
                   constraints:
                     nullable: false
+              - column:
+                  name: password_change_required
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
         - addUniqueConstraint:
             tableName: identity_profiles
             columnNames: tenant_id, email

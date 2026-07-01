@@ -125,8 +125,7 @@ public class KeycloakIdentityProvider implements IdentityProvider {
         var keycloakUser = userConverter.fromCreateRequest(request);
         var userId = keyCloakService.createUser(keycloakUser);
 
-        return getUserById(userId).orElseThrow(() ->
-            new FunctionalException("User created but not found"));
+        return getUserById(userId).orElseThrow(() -> new FunctionalException("User created but not found"));
     }
 
     @Override

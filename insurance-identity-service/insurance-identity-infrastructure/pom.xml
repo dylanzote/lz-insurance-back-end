@@ -76,6 +76,16 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- Keycloak admin integration: the shared IdentityProvider SPI + its Keycloak adapter,
+             KeyCloakService, KeycloakProperties. The identity service's KeycloakUserPort adapter
+             delegates to this module rather than re-implementing the admin client (US-M2-001).
+             Pulls insurance-security-core (SPI types) transitively. -->
+        <dependency>
+            <groupId>com.lz_insurance.security.keycloak</groupId>
+            <artifactId>insurance-security-keycloak</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- MapStruct -->
         <dependency>
             <groupId>org.mapstruct</groupId>

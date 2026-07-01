@@ -37,6 +37,7 @@ class IdentityProfileTest {
             assertThat(p.getBranchId()).isEqualTo("branch-1");
             assertThat(p.getStatus()).isEqualTo(IdentityStatus.PENDING_APPROVAL);
             assertThat(p.getKeycloakUserId()).isNull();
+            assertThat(p.isPasswordChangeRequired()).isFalse();
         }
 
         @Test
@@ -78,6 +79,7 @@ class IdentityProfileTest {
 
             assertThat(p.getStatus()).isEqualTo(IdentityStatus.ACTIVE);
             assertThat(p.getKeycloakUserId()).isEqualTo("kc-123");
+            assertThat(p.isPasswordChangeRequired()).isTrue();
         }
 
         @Test
@@ -125,6 +127,41 @@ class IdentityProfileTest {
         void deactivateFromPendingRejected() {
             IdentityProfile p = internal();
             assertThatThrownBy(p::deactivate).isInstanceOf(InvalidStateTransitionException.class);
+        }
+    }
+
+    @Nested
+    class ForcedPasswordChange {
+
+        @Test
+        @DisplayName("completePasswordChange clears the flag for an ACTIVE profile with a pending change")
+        void completesFromActive() {
+            IdentityProfile p = internal();
+            p.activate("kc-123");
+
+            p.completePasswordChange();
+
+            assertThat(p.isPasswordChangeRequired()).isFalse();
+            assertThat(p.getStatus()).isEqualTo(IdentityStatus.ACTIVE);
+        }
+
+        @Test
+        @DisplayName("completePasswordChange on a PENDING profile (never activated) is rejected")
+        void rejectedWhenNotActive() {
+            IdentityProfile p = internal();
+            assertThatThrownBy(p::completePasswordChange)
+                    .isInstanceOf(InvalidStateTransitionException.class);
+        }
+
+        @Test
+        @DisplayName("completePasswordChange is rejected when there is no pending change (already completed)")
+        void rejectedWhenNothingPending() {
+            IdentityProfile p = internal();
+            p.activate("kc-123");
+            p.completePasswordChange();
+
+            assertThatThrownBy(p::completePasswordChange)
+                    .isInstanceOf(InvalidStateTransitionException.class);
         }
     }
 }
